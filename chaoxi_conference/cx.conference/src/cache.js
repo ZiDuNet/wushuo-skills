@@ -12,7 +12,7 @@
  *       summary.txt                   # 总结
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { config } from "./config.js";
 
@@ -212,4 +212,73 @@ export async function usePresentation(conferenceId, presentationId) {
       summary,
     },
   };
+}
+
+// ─── Cross-Conference Search ─────────────────────────
+
+/** 获取所有已缓存的会议目录 */
+export function listCachedConferences() {
+  if (!existsSync(DATA_DIR)) return [];
+  const entries = readdirSync(DATA_DIR, { withFileTypes: true });
+  const result = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const catalog = readJson(catalogPath(entry.name));
+    if (catalog) {
+      result.push({ conferenceId: entry.name, presentationCount: catalog.length });
+    }
+  }
+  return result;
+}
+
+/** 跨所有缓存会议搜索关键词 */
+export function searchAllCatalogs(keyword) {
+  if (!existsSync(DATA_DIR)) return [];
+  const kw = keyword.toLowerCase();
+  const results = [];
+  const entries = readdirSync(DATA_DIR, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const catalog = readJson(catalogPath(entry.name));
+    if (!catalog) continue;
+
+    for (const p of catalog) {
+      const searchText = [
+        p.title, p.speakerName, p.speakerTitle,
+        p.abstract, p.forum, p.keywords,
+      ].filter(Boolean).join(" ").toLowerCase();
+
+      if (searchText.includes(kw)) {
+        results.push({
+          conferenceId: entry.name,
+          presentationId: p.objectId,
+          title: p.title,
+          speakerName: p.speakerName,
+          speakerTitle: p.speakerTitle,
+          forum: p.forum,
+          abstract: p.abstract?.substring(0, 200),
+          status: p.status,
+        });
+      }
+    }
+  }
+
+  return results;
+}
+
+/** 在所有会议中查找某个演讲（用于 use-presentation 跨会议查找） */
+export function findPresentation(presId) {
+  if (!existsSync(DATA_DIR)) return null;
+  const entries = readdirSync(DATA_DIR, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const catalog = readJson(catalogPath(entry.name));
+    if (!catalog) continue;
+    const p = catalog.find((x) => x.objectId === presId);
+    if (p) return { conferenceId: entry.name, presentation: p };
+  }
+
+  return null;
 }

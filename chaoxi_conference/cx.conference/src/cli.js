@@ -254,18 +254,28 @@ function handleUseConference(args) {
 async function handleUsePresentation(args) {
   const { values, positionals } = parseArgs({
     args,
-    options: { user: { type: "string", short: "u" } },
+    options: {
+      user: { type: "string", short: "u" },
+      conf: { type: "string", short: "c" },
+    },
     allowPositionals: true,
     strict: true,
   });
   const callerUser = requireUser(values);
   requireAuth(callerUser);
-  const bind = requireBind(callerUser);
 
   const presId = positionals[0];
-  if (!presId) outputError("缺少 presentationId", "用法: cx-conference use-presentation <presId> --user <id>");
+  if (!presId) outputError("缺少 presentationId", "用法: cx-conference use-presentation <presId> --conf <confId> --user <id>");
 
-  const result = await cache.usePresentation(bind.conferenceId, presId);
+  // 确定会议 ID：优先用 --conf，否则在所有缓存中查找
+  let conferenceId = values.conf;
+  if (!conferenceId) {
+    const found = cache.findPresentation(presId);
+    if (!found) outputError("未找到该演讲", "请先执行 auto 加载会议数据，或用 --conf 指定会议 ID");
+    conferenceId = found.conferenceId;
+  }
+
+  const result = await cache.usePresentation(conferenceId, presId);
   if (!result.ok || !result.data) {
     return output({ ok: false, message: result.message });
   }
@@ -280,6 +290,7 @@ async function handleUsePresentation(args) {
 
   output({
     ok: true,
+    conferenceId,
     presentation: safeMeta,
     hasIntro: !!data.intro,
     hasContent: !!data.content,
@@ -290,24 +301,55 @@ async function handleUsePresentation(args) {
   });
 }
 
+// ─── Search Command ──────────────────────────────────
+
+/**
+ * search — 跨所有会议搜索关键词
+ *
+ * 在标题、演讲者、摘要、论坛等字段中搜索
+ */
+async function handleSearch(args) {
+  const { values, positionals } = parseArgs({
+    args,
+    options: { user: { type: "string", short: "u" } },
+    allowPositionals: true,
+    strict: true,
+  });
+  const callerUser = requireUser(values);
+  requireAuth(callerUser);
+
+  const keyword = positionals[0];
+  if (!keyword) outputError("缺少搜索关键词", "用法: cx-conference search <关键词> --user <id>");
+
+  const results = cache.searchAllCatalogs(keyword);
+
+  return output({
+    ok: true,
+    keyword,
+    totalMatches: results.length,
+    matches: results,
+    tip: results.length > 0
+      ? `使用 use-presentation <presId> --conf <confId> --user ${callerUser} 查看详情`
+      : "没有匹配结果，请尝试其他关键词",
+  });
+}
+
 // ─── Auto Command ────────────────────────────────────
 
 /**
- * auto — 一键获取会议数据
+ * auto — 一键获取所有会议数据
  *
  * 自动检测状态，缺什么补什么：
  * 1. 未登录/过期 → 返回 needLogin，AI 引导登录
- * 2. 未绑定 → 列出会议（只有一个自动绑定）
- * 3. --rebind → 强制重新选择会议
- * 4. --refresh → 强制刷新缓存
- * 5. 已就绪 → 返回演讲列表
+ * 2. 拉取所有会议列表，加载并缓存每个会议的目录
+ * 3. --refresh → 强制刷新所有缓存
+ * 4. 已就绪 → 返回所有会议和演讲列表
  */
 async function handleAuto(args) {
   const { values } = parseArgs({
     args,
     options: {
       user: { type: "string", short: "u" },
-      rebind: { type: "boolean", short: "r" },
       refresh: { type: "boolean", short: "f" },
     },
     strict: true,
@@ -330,63 +372,64 @@ async function handleAuto(args) {
     });
   }
 
-  // 2. 换绑：--rebind 清除旧绑定
-  if (values.rebind) {
-    auth.clearBind(callerUser);
+  // 2. 拉取所有会议列表
+  const result = await auth.listConference(callerUser);
+  if (!result.ok || !result.conferences?.length) {
+    return output({ step: "noConference", message: "没有可用的会议" });
   }
 
-  // 3. 检查绑定
-  let bind = auth.getBind(callerUser);
-  if (!bind) {
-    const result = await auth.listConference(callerUser);
-    if (!result.ok || !result.conferences?.length) {
-      return output({ step: "noConference", message: "没有可用的会议" });
-    }
-    // 只有一个会议，自动绑定
-    if (result.conferences.length === 1) {
-      const conf = result.conferences[0];
-      const confId = conf.objectId || conf.id || conf.conferenceId;
-      auth.writeBind(callerUser, { conferenceId: confId, boundAt: Date.now() });
-      bind = { conferenceId: confId, boundAt: Date.now() };
+  // 3. 加载并缓存每个会议的目录
+  const allConferences = [];
+  const total = result.conferences.length;
+  for (let i = 0; i < total; i++) {
+    const conf = result.conferences[i];
+    const confId = conf.objectId || conf.id || conf.conferenceId;
+    const confName = conf.name || conf.title || confId;
+
+    // 优先用缓存，--refresh 时强制重新拉取
+    let catalog = values.refresh ? null : cache.useConference(confId);
+    if (!catalog) {
+      process.stderr.write(`[${i + 1}/${total}] 正在缓存: ${confName} ...\n`);
+      const catalogResult = await auth.loadConferenceCatalog(callerUser, confId);
+      if (catalogResult.ok) {
+        await cache.loadConference(confId, catalogResult.presentations || []);
+        catalog = catalogResult.presentations || [];
+        process.stderr.write(`[${i + 1}/${total}] ✓ ${confName}（${catalog.length} 个演讲）\n`);
+      } else {
+        catalog = [];
+        process.stderr.write(`[${i + 1}/${total}] ✗ ${confName} 加载失败: ${catalogResult.message}\n`);
+      }
     } else {
-      return output({
-        step: "needBind",
-        message: "请选择会议",
-        conferences: result.conferences,
-        next: `{skill-folder}/cx-conference bind-conference <confId> --user ${callerUser}`,
-      });
+      process.stderr.write(`[${i + 1}/${total}] 已缓存: ${confName}（${catalog.length} 个演讲）\n`);
     }
+
+    allConferences.push({
+      conferenceId: confId,
+      conferenceName: confName,
+      totalPresentations: catalog.length,
+      presentations: catalog.map((p) => ({
+        objectId: p.objectId,
+        title: p.title,
+        speakerName: p.speakerName,
+        speakerTitle: p.speakerTitle,
+        forum: p.forum,
+        status: p.status,
+        slideCount: p.slideCount,
+        planStart: p.planStart,
+        abstract: p.abstract,
+      })),
+    });
   }
 
-  // 4. 加载数据（--refresh 强制重新拉取）
-  let catalog = values.refresh ? null : cache.useConference(bind.conferenceId);
-  if (!catalog) {
-    const catalogResult = await auth.loadConferenceCatalog(callerUser, bind.conferenceId);
-    if (!catalogResult.ok) {
-      return output({ step: "error", message: catalogResult.message });
-    }
-    await cache.loadConference(bind.conferenceId, catalogResult.presentations || []);
-    catalog = catalogResult.presentations || [];
-  }
-
-  // 5. 返回数据
+  // 4. 返回所有数据
+  const totalPres = allConferences.reduce((sum, c) => sum + c.totalPresentations, 0);
   return output({
     step: "ready",
-    message: "会议数据已就绪",
-    conferenceId: bind.conferenceId,
-    totalPresentations: catalog.length,
-    presentations: catalog.map((p) => ({
-      objectId: p.objectId,
-      title: p.title,
-      speakerName: p.speakerName,
-      speakerTitle: p.speakerTitle,
-      forum: p.forum,
-      status: p.status,
-      slideCount: p.slideCount,
-      planStart: p.planStart,
-      abstract: p.abstract,
-    })),
-    tip: "使用 use-presentation <presId> --user <id> 查看演讲详情",
+    message: `所有会议数据已就绪（${allConferences.length} 个会议，${totalPres} 个演讲）`,
+    totalConferences: allConferences.length,
+    totalPresentations: totalPres,
+    conferences: allConferences,
+    tip: "使用 search <关键词> 搜索，或 use-presentation <presId> --user <id> 查看详情",
   });
 }
 
@@ -415,7 +458,8 @@ async function main() {
     case "load-conference":     return handleLoadConference(rest);
     case "use-conference":      return handleUseConference(rest);
     case "use-presentation":    return handleUsePresentation(rest);
-    default:                    outputError(`未知命令: ${command}`, "支持: auto, login, verify, check, me, logout, list-conference, bind-conference, load-conference, use-conference, use-presentation");
+    case "search":              return handleSearch(rest);
+    default:                    outputError(`未知命令: ${command}`, "支持: auto, login, verify, check, me, logout, list-conference, bind-conference, load-conference, use-conference, use-presentation, search");
   }
 }
 
