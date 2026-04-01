@@ -10,7 +10,7 @@ chaoxi_skills/
 │   └── cx.wechat-article/       # 微信公众号文章撰写   v0.0.3
 ├── chaoxi_conference/            # 潮汐会议数据服务
 │   └── cx.conference/           # 会议演讲数据获取      v0.0.3
-├── skillsdevtools/               # 开发辅助工具
+├── _devtools/                    # 内部开发工具（不面向终端用户）
 └── tmp/                          # 临时文件（不提交）
 ```
 

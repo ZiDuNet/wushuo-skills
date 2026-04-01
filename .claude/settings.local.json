@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"D:/AI/chaoxi_skills/chaoxi_conference\" -name \"._*\" -delete)",
+      "Bash(find \"D:/AI/chaoxi_skills/chaoxi_conference\" -type d -name \"PaxHeader\" -exec rm -rf {} +)",
+      "Bash(bash \"D:/AI/chaoxi_skills/chaoxi_conference/conference/cx-conference\" --help)",
+      "Bash(bash \"D:/AI/chaoxi_skills/chaoxi_conference/conference/cx-conference\" check --user test_user)"
+    ]
+  }
+}

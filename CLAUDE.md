@@ -13,7 +13,7 @@
 ```
 platforms/          # 各平台发布类 skill
 chaoxi_conference/  # 潮汐会议数据服务
-skillsdevtools/     # 本项目开发辅助工具
+_devtools/          # 内部开发工具（skill-creator 等）
 tmp/                # 临时文件，不提交
 ```
 
@@ -96,9 +96,9 @@ metadata:                        # 按需
 
 ### skill-creator
 
-> 本项目创建新 skill 时，**必须参考 `skillsdevtools/skill-creator/SKILL.md`**。
+> 本项目创建新 skill 时，**必须参考 `_devtools/skill-creator/SKILL.md`**。
 
-skill-creator 的完整文件已在 `skillsdevtools/skill-creator/` 下，包含 SKILL.md、agents、scripts、eval-viewer 等。不依赖外部安装。
+skill-creator 的完整文件已在 `_devtools/skill-creator/` 下，包含 SKILL.md、agents、scripts、eval-viewer 等。不依赖外部安装。
 
 核心流程：
 
@@ -112,7 +112,7 @@ skill-creator 的完整文件已在 `skillsdevtools/skill-creator/` 下，包含
 
 ### scripts/
 
-`skillsdevtools/scripts/` 下放项目级别的开发脚本（如版本号同步、skill 模板生成等）。
+`_devtools/scripts/` 下放项目级别的开发脚本（如版本号同步、skill 模板生成等）。
 
 ## 运行环境
 
