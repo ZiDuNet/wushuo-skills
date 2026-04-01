@@ -298,6 +298,7 @@ async function handleUsePresentation(args) {
     hasSummary: !!data.summary,
     contentLength: data.content?.length ?? 0,
     scriptLength: data.script?.length ?? 0,
+    validatedImages: data.validatedImages ?? [],
   });
 }
 

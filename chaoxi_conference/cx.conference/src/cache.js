@@ -201,6 +201,27 @@ export async function usePresentation(conferenceId, presentationId) {
     ensureFile(p.summary, "summary.txt"),
   ]);
 
+  // 解析 intro.yaml，验证图片 URL 可访问性
+  let validatedImages = [];
+  if (intro) {
+    const imageUrls = [];
+    for (const line of intro.split("\n")) {
+      const m = line.match(/^\s*imageUrl:\s*["']?(https?:\/\/\S+?)["']?\s*$/);
+      if (m) imageUrls.push(m[1]);
+    }
+    if (imageUrls.length > 0) {
+      const checkUrl = async (url) => {
+        try {
+          const res = await fetch(url, { method: "HEAD", signal: AbortSignal.timeout(5000) });
+          return { url, accessible: res.ok };
+        } catch {
+          return { url, accessible: false };
+        }
+      };
+      validatedImages = await Promise.all(imageUrls.map(checkUrl));
+    }
+  }
+
   return {
     ok: true,
     message: "加载成功",
@@ -210,6 +231,7 @@ export async function usePresentation(conferenceId, presentationId) {
       content,
       script,
       summary,
+      validatedImages,
     },
   };
 }
