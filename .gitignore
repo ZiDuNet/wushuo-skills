@@ -1,0 +1,9 @@
+node_modules/
+.auth/
+.session.json
+data/
+._*
+PaxHeader/
+.DS_Store
+Thumbs.db
+别人的skills/

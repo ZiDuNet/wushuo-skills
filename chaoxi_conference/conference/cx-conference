@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# cx-conference — 会议技能 CLI
+# 用法: ./cx-conference <command> [options]
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec node "$SCRIPT_DIR/src/cli.js" "$@"

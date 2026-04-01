@@ -1,0 +1,6 @@
+{
+  "api": {
+    "baseURL": "https://chaoxi.live/api",
+    "timeout": 20000
+  }
+}
