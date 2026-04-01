@@ -51,8 +51,8 @@ function output(data) {
   process.exit(0);
 }
 
-function outputError(message, details) {
-  console.log(JSON.stringify({ ok: false, error: message, details }, null, 2));
+function outputError(message, details, suggestion) {
+  console.log(JSON.stringify({ ok: false, error: message, details, suggestion }, null, 2));
   process.exit(1);
 }
 
@@ -64,15 +64,15 @@ function requireUser(values) {
 /** 确保已登录且 token 未过期 */
 function requireAuth(callerUser) {
   const status = auth.check(callerUser);
-  if (!status.loggedIn) outputError("未登录", "请先执行: cx-conference login --user <id> --mobile <phone>");
-  if (status.expired) outputError("登录已过期", "请重新执行 login");
+  if (!status.loggedIn) outputError("未登录", `用户 ${callerUser} 没有有效的登录凭证`, "请先执行: cx-conference login --user <id> --mobile <手机号>");
+  if (status.expired) outputError("登录已过期", `用户 ${callerUser} 的 token 已于 ${new Date(status.data.exp * 1000).toLocaleString()} 过期`, "请重新执行: cx-conference login --user <id> --mobile <手机号>");
   return status.data;
 }
 
 /** 确保已绑定会议 */
 function requireBind(callerUser) {
   const bind = auth.getBind(callerUser);
-  if (!bind) outputError("未绑定会议", "请先执行: cx-conference bind-conference <confId> --user <id>");
+  if (!bind) outputError("未绑定会议", `用户 ${callerUser} 没有绑定任何会议`, "请执行: cx-conference bind-conference <confId> --user <id>，或执行 auto 自动加载所有会议");
   return bind;
 }
 
@@ -302,39 +302,6 @@ async function handleUsePresentation(args) {
   });
 }
 
-// ─── Search Command ──────────────────────────────────
-
-/**
- * search — 跨所有会议搜索关键词
- *
- * 在标题、演讲者、摘要、论坛等字段中搜索
- */
-async function handleSearch(args) {
-  const { values, positionals } = parseArgs({
-    args,
-    options: { user: { type: "string", short: "u" } },
-    allowPositionals: true,
-    strict: true,
-  });
-  const callerUser = requireUser(values);
-  requireAuth(callerUser);
-
-  const keyword = positionals[0];
-  if (!keyword) outputError("缺少搜索关键词", "用法: cx-conference search <关键词> --user <id>");
-
-  const results = cache.searchAllCatalogs(keyword);
-
-  return output({
-    ok: true,
-    keyword,
-    totalMatches: results.length,
-    matches: results,
-    tip: results.length > 0
-      ? `使用 use-presentation <presId> --conf <confId> --user ${callerUser} 查看详情`
-      : "没有匹配结果，请尝试其他关键词",
-  });
-}
-
 // ─── Auto Command ────────────────────────────────────
 
 /**
@@ -440,7 +407,7 @@ async function handleAuto(args) {
     loadingLog,
     totalPresentations: totalPres,
     conferences: allConferences,
-    tip: "使用 search <关键词> 搜索，或 use-presentation <presId> --user <id> 查看详情",
+    tip: "浏览 conferences 中的 presentations 找到感兴趣的演讲，使用 use-presentation <presId> --conf <confId> --user <id> 查看详情",
   });
 }
 
@@ -469,8 +436,7 @@ async function main() {
     case "load-conference":     return handleLoadConference(rest);
     case "use-conference":      return handleUseConference(rest);
     case "use-presentation":    return handleUsePresentation(rest);
-    case "search":              return handleSearch(rest);
-    default:                    outputError(`未知命令: ${command}`, "支持: auto, login, verify, check, me, logout, list-conference, bind-conference, load-conference, use-conference, use-presentation, search");
+    default:                    outputError(`未知命令: ${command}`, "支持: auto, login, verify, check, me, logout, list-conference, bind-conference, load-conference, use-conference, use-presentation");
   }
 }
 

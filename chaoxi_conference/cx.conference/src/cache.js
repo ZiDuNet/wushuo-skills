@@ -236,7 +236,7 @@ export async function usePresentation(conferenceId, presentationId) {
   };
 }
 
-// ─── Cross-Conference Search ─────────────────────────
+// ─── Cross-Conference Helpers ─────────────────────────
 
 /** 获取所有已缓存的会议目录 */
 export function listCachedConferences() {
@@ -251,42 +251,6 @@ export function listCachedConferences() {
     }
   }
   return result;
-}
-
-/** 跨所有缓存会议搜索关键词 */
-export function searchAllCatalogs(keyword) {
-  if (!existsSync(DATA_DIR)) return [];
-  const kw = keyword.toLowerCase();
-  const results = [];
-  const entries = readdirSync(DATA_DIR, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const catalog = readJson(catalogPath(entry.name));
-    if (!catalog) continue;
-
-    for (const p of catalog) {
-      const searchText = [
-        p.title, p.speakerName, p.speakerTitle,
-        p.abstract, p.forum, p.keywords,
-      ].filter(Boolean).join(" ").toLowerCase();
-
-      if (searchText.includes(kw)) {
-        results.push({
-          conferenceId: entry.name,
-          presentationId: p.objectId,
-          title: p.title,
-          speakerName: p.speakerName,
-          speakerTitle: p.speakerTitle,
-          forum: p.forum,
-          abstract: p.abstract?.substring(0, 200),
-          status: p.status,
-        });
-      }
-    }
-  }
-
-  return results;
 }
 
 /** 在所有会议中查找某个演讲（用于 use-presentation 跨会议查找） */
