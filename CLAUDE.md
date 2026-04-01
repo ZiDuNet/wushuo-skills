@@ -96,9 +96,11 @@ metadata:                        # 按需
 
 ### skill-creator
 
-> 本项目创建新 skill 时，**必须使用 `/skill-creator`**。
+> 本项目创建新 skill 时，**必须参考 `skillsdevtools/skill-creator/SKILL.md`**。
 
-skill-creator 是已安装的 Claude Code skill，用于创建、修改、优化 skill。核心流程：
+skill-creator 的完整文件已在 `skillsdevtools/skill-creator/` 下，包含 SKILL.md、agents、scripts、eval-viewer 等。不依赖外部安装。
+
+核心流程：
 
 1. **明确意图** — 确定 skill 要做什么、何时触发、输出格式
 2. **调研** — 查看现有 skill、MCP、最佳实践
