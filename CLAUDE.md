@@ -89,3 +89,33 @@ metadata:                        # 按需
 - CLI 输出统一 JSON 格式，进度信息走 stderr（`process.stderr.write`）
 - 缓存数据按 skill/data/{id}/ 结构组织，支持增量更新
 - 所有命令必须支持 `--user` 参数做用户隔离
+
+---
+
+## 开发工具
+
+### skill-creator
+
+> 本项目创建新 skill 时，**必须使用 `/skill-creator`**。
+
+skill-creator 是已安装的 Claude Code skill，用于创建、修改、优化 skill。核心流程：
+
+1. **明确意图** — 确定 skill 要做什么、何时触发、输出格式
+2. **调研** — 查看现有 skill、MCP、最佳实践
+3. **编写 SKILL.md** — 按本项目的规范格式编写
+4. **测试** — 编写测试 prompt 并验证触发和输出
+5. **迭代优化** — 根据测试结果修改，重复直到满意
+
+使用方式：在对话中输入 `/skill-creator`，然后按引导操作。
+
+### scripts/
+
+`skillsdevtools/scripts/` 下放项目级别的开发脚本（如版本号同步、skill 模板生成等）。
+
+## 运行环境
+
+- **Node.js** 18+（内置 fetch、parseArgs，ESM 支持）
+- **Python** 3.10+（如需 skill-creator 的 eval 工具）
+- **Git** 2.x
+- **包管理**：零外部依赖原则，尽量只用内置 API
+- **操作系统**：开发环境 Windows，脚本需兼容 Linux（WSL / CI）
