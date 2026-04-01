@@ -380,6 +380,7 @@ async function handleAuto(args) {
 
   // 3. 加载并缓存每个会议的目录
   const allConferences = [];
+  const loadingLog = [];
   const total = result.conferences.length;
   for (let i = 0; i < total; i++) {
     const conf = result.conferences[i];
@@ -389,18 +390,26 @@ async function handleAuto(args) {
     // 优先用缓存，--refresh 时强制重新拉取
     let catalog = values.refresh ? null : cache.useConference(confId);
     if (!catalog) {
-      process.stderr.write(`[${i + 1}/${total}] 正在缓存: ${confName} ...\n`);
+      const logMsg = `[${i + 1}/${total}] 正在获取: ${confName} ...`;
+      loadingLog.push(logMsg);
+      process.stderr.write(logMsg + "\n");
       const catalogResult = await auth.loadConferenceCatalog(callerUser, confId);
       if (catalogResult.ok) {
         await cache.loadConference(confId, catalogResult.presentations || []);
         catalog = catalogResult.presentations || [];
-        process.stderr.write(`[${i + 1}/${total}] ✓ ${confName}（${catalog.length} 个演讲）\n`);
+        const doneMsg = `[${i + 1}/${total}] ✓ ${confName}（${catalog.length} 个演讲）`;
+        loadingLog.push(doneMsg);
+        process.stderr.write(doneMsg + "\n");
       } else {
         catalog = [];
-        process.stderr.write(`[${i + 1}/${total}] ✗ ${confName} 加载失败: ${catalogResult.message}\n`);
+        const failMsg = `[${i + 1}/${total}] ✗ ${confName} 加载失败: ${catalogResult.message}`;
+        loadingLog.push(failMsg);
+        process.stderr.write(failMsg + "\n");
       }
     } else {
-      process.stderr.write(`[${i + 1}/${total}] 已缓存: ${confName}（${catalog.length} 个演讲）\n`);
+      const cacheMsg = `[${i + 1}/${total}] 已缓存: ${confName}（${catalog.length} 个演讲）`;
+      loadingLog.push(cacheMsg);
+      process.stderr.write(cacheMsg + "\n");
     }
 
     allConferences.push({
@@ -427,6 +436,7 @@ async function handleAuto(args) {
     step: "ready",
     message: `所有会议数据已就绪（${allConferences.length} 个会议，${totalPres} 个演讲）`,
     totalConferences: allConferences.length,
+    loadingLog,
     totalPresentations: totalPres,
     conferences: allConferences,
     tip: "使用 search <关键词> 搜索，或 use-presentation <presId> --user <id> 查看详情",
