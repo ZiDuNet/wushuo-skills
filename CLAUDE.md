@@ -13,6 +13,7 @@
 ```
 platforms/          # 各平台发布类 skill
 chaoxi_conference/  # 潮汐会议数据服务
+skillsdevtools/     # 本项目开发辅助工具
 tmp/                # 临时文件，不提交
 ```
 
