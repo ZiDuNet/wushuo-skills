@@ -2,7 +2,7 @@
 name: cx.wechat-article
 description: |
   Use when user wants to write, polish, or format a WeChat public account article (微信公众号文章). Triggers on mentions of 公众号, 微信文章, 排版. Generates WeChat-compatible HTML with selectable themes.
-version: 0.1.0
+version: 0.0.3
 metadata:
   openclaw:
     emoji: "📝"

@@ -2,7 +2,7 @@
 name: cx.conference
 description: |
   Use when user needs to fetch presentation data (slides, scripts, summaries) from 潮汐 conference platform. Triggers on: accessing conference speech content, downloading PPT/演讲稿, listing presentations, or explicitly mentions "cx.conference" / "潮汐". Do NOT trigger for general meeting scheduling or discussion.
-version: 2.0.0
+version: 0.0.3
 metadata:
   openclaw:
     emoji: "🎥"
