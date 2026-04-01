@@ -1,0 +1,30 @@
+# Chaoxi Skills
+
+潮汐平台 AI Agent 技能集合。
+
+## 目录结构
+
+```
+chaoxi_skills/
+├── platforms/                    # 各平台发布类 skill
+│   └── cx.wechat-article/       # 微信公众号文章撰写
+├── chaoxi_conference/            # 潮汐会议数据服务
+│   └── cx.conference/           # 会议演讲数据获取
+└── tmp/                          # 临时文件（不提交）
+```
+
+## Skills
+
+### cx.wechat-article
+
+> 微信公众号文章撰写与排版
+
+根据主题、素材或已有内容，生成符合微信公众平台的文章。支持 5 种排版风格（classic / tech-blue / warm-orange / elegant-green / dark），自动匹配主题，输出 Markdown + 微信兼容 HTML，可选推送到草稿箱。
+
+### cx.conference
+
+> 潮汐会议演讲数据获取
+
+提供会议演讲数据（PPT 内容、演讲稿、摘要等）。登录后自动加载所有会议目录，支持跨会议关键词搜索（`search`），按需获取演讲详情。
+
+**核心命令**：`auto`（自动加载所有会议）→ `search`（关键词搜索）→ `use-presentation`（获取演讲详情）
