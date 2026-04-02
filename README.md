@@ -7,16 +7,16 @@
 ```
 chaoxi_skills/
 ├── platforms/                    # 各平台发布类 skill
-│   └── cx.wechat-article/       # 微信公众号文章撰写   v0.0.3
+│   └── cx-wechat-article/       # 微信公众号文章撰写   v0.0.3
 ├── chaoxi_conference/            # 潮汐会议数据服务
-│   └── cx.conference/           # 会议演讲数据获取      v0.0.3
+│   └── cx-conference/           # 会议演讲数据获取      v0.0.3
 ├── _devtools/                    # 内部开发工具（不面向终端用户）
 └── tmp/                          # 临时文件（不提交）
 ```
 
 ## Skills
 
-### cx.wechat-article `v0.0.3`
+### cx-wechat-article `v0.0.3`
 
 > 微信公众号文章撰写与排版
 
@@ -24,7 +24,7 @@ chaoxi_skills/
 
 **流程**：确认风格 → 生成 Markdown → 用户确认 → 渲染微信 HTML → 可选推送
 
-### cx.conference `v0.0.3`
+### cx-conference `v0.0.3`
 
 > 潮汐会议演讲数据获取
 

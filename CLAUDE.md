@@ -19,8 +19,8 @@ tmp/                # 临时文件，不提交
 
 ## 命名规范
 
-- Skill 目录名统一 `cx.` 前缀，如 `cx.wechat-article`、`cx.conference`
-- 脚本文件用 kebab-case（如 `push-draft.cjs`）
+- Skill 目录名统一 `cx-` 前缀，如 `cx-wechat-article`、`cx-conference`
+- 脚本文件用 kebab-case（如 `push-draft.js`）
 - 版本号所有 skill 保持一致，统一递增
 
 ## 提交规范
@@ -48,7 +48,7 @@ tmp/                # 临时文件，不提交
 
 本项目对 skill 的额外约束：
 
-- 目录名 `cx.` 前缀
+- 目录名 `cx-` 前缀
 - 版本号与其他 skill 保持一致
 - Node.js 脚本零外部依赖
 - CLI 输出 JSON，进度走 stderr

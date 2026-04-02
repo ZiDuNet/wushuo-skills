@@ -1,18 +1,19 @@
-'use strict';
-
 /**
- * push-draft.cjs — 将微信 HTML 推送到公众号草稿箱
+ * push-draft.js — 将微信 HTML 推送到公众号草稿箱
  *
  * 流程：获取 token → 上传封面 → 替换正文外部图片 → 推送草稿
  *
  * 用法：
- *   node push-draft.cjs --html <HTML文件> --title <标题> --appid <AppID> --secret <Secret> --cover <封面图>
+ *   node push-draft.js --html <HTML文件> --title <标题> --appid <AppID> --secret <Secret> --cover <封面图>
  *
  * 依赖：Node.js 18+（内置 fetch），零 npm 依赖
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const WECHAT_API = 'https://api.weixin.qq.com/cgi-bin';
 const CACHE_PATH = path.join(__dirname, '..', '.cache.json');

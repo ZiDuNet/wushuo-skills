@@ -1,5 +1,5 @@
 ---
-name: cx.wechat-article
+name: cx-wechat-article
 description: |
   Use when user wants to write, polish, or format a WeChat public account article (微信公众号文章). Triggers on mentions of 公众号, 微信文章, 排版. Generates WeChat-compatible HTML with selectable themes.
 version: 0.0.3
@@ -8,7 +8,7 @@ metadata:
     emoji: "📝"
 ---
 
-# cx.wechat-article — 微信公众号文章撰写
+# cx-wechat-article — 微信公众号文章撰写
 
 根据主题、素材或已有 Markdown，生成图文并茂的微信公众号文章，输出微信兼容的 HTML，支持多种排版风格。
 
@@ -162,7 +162,7 @@ prompt: |
 ### 推送命令
 
 ```bash
-node "{skill-folder}/scripts/push-draft.cjs" \
+node "{skill-folder}/scripts/push-draft.js" \
   --html "<HTML文件路径>" \
   --title "文章标题" \
   --appid "<AppID>" \
