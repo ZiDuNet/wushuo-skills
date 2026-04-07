@@ -2,7 +2,7 @@
 name: cx-wechat-article
 description: |
   当用户需要撰写、润色或排版微信公众号文章时触发。关键词：公众号、微信文章、排版、图文。生成微信兼容 HTML，支持多种排版风格，基于潮汐智能会议数据的文章必须配图并标注来源。
-version: 0.0.6
+version: 0.0.10
 metadata:
   openclaw:
     emoji: "📝"

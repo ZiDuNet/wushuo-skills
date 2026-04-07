@@ -2,7 +2,7 @@
 name: cx-conference
 description: |
   当用户需要获取潮汐智能会议的演讲数据（PPT 内容、演讲稿、摘要、幻灯片图片）时触发。关键词：演讲、PPT、演讲稿、会议数据、"cx-conference"、"潮汐智能会议"。不触发：普通会议安排或讨论。
-version: 0.0.6
+version: 0.0.10
 metadata:
   openclaw:
     emoji: "🎥"
@@ -23,6 +23,8 @@ metadata:
 ```
 node {skill-folder}/src/cli.js auto --user <id>
 ```
+
+> **重要**：auto 会自动检测登录状态。如果用户之前已登录且未过期，直接返回会议列表，**不需要重新登录**。只有返回 `needLogin` 时才引导用户登录。
 
 **返回值中的 `step` 字段：**
 
@@ -77,7 +79,7 @@ node {skill-folder}/src/cli.js use-presentation <presId> --conf <confId> --user 
 
 ```
 # 1. 获取会议列表（秒回）
-node {skill-folder}/src/cli.js auto --user alice
+node {skill-folder}/src/cli.js auto --user 13800138000
 → { step: "selectConference",
     conferences: [
       { conferenceId: "conf_abc", conferenceName: "2024春季金属峰会" },
@@ -87,14 +89,14 @@ node {skill-folder}/src/cli.js auto --user alice
 
 # 2. AI 将列表展示给用户，用户选择 "2024春季金属峰会"
 # 3. 加载该会议目录
-node {skill-folder}/src/cli.js load-catalog --conf conf_abc --user alice
+node {skill-folder}/src/cli.js load-catalog --conf conf_abc --user 13800138000
 → { step: "ready", conferences: [{
       conferenceName: "2024春季金属峰会",
       presentations: [{ objectId: "pres_123", title: "钨金属材料发展趋势", ... }]
     }] }
 
 # 4. AI 在返回数据中直接匹配到"钨金属材料发展趋势"，→ 获取详情
-node {skill-folder}/src/cli.js use-presentation pres_123 --conf conf_abc --user alice
+node {skill-folder}/src/cli.js use-presentation pres_123 --conf conf_abc --user 13800138000
 → { ok: true, hasContent: true, hasScript: true, validatedImages: [...] }
 
 # 5. AI 基于演讲数据生成文章
@@ -153,6 +155,6 @@ data/{conferenceId}/
 ## 执行要求
 
 - **工作目录**：在用户当前工作目录执行，不要 cd 到 skill 目录
-- **`--user` 参数**：所有命令必填，标识调用者身份
+- **`--user` 参数**：所有命令必填，标识调用者身份。**必须使用用户的手机号**作为 user id（如 `--user 13800138000`），确保同一用户在不同会话中使用相同的 user id，以复用登录状态和缓存数据。同一手机号的 token 和缓存互不可见。
 - **token 过期**：auto 返回 `needLogin` 时引导用户重新登录
 - **搜索策略**：用户提到具体主题时，AI 直接在 load-catalog 返回的数据中联想匹配，不要局限于当前绑定的会议

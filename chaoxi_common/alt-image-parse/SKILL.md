@@ -1,5 +1,5 @@
 ---
-name: alt.image-parse
+name: alt-image-parse
 description: |
   AI 图片解析技能。
 
@@ -265,7 +265,7 @@ cd {skill-folder}/src && bun install
 
 | 你想要 | 应该用什么 |
 |-------|-----------|
-| 生成图片 | alt.image-gen 技能 |
+| 生成图片 | alt-image-gen 技能 |
 | 编辑图片像素/颜色 | 图像编辑工具 |
 | 转换图片格式 | imagemagick |
 | 压缩/裁剪图片 | 图像处理工具 |

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# alt.image-parse 安装脚本
+# alt-image-parse 安装脚本
 # 检测系统环境并安装必要依赖
 
 set -e
@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo -e "${BLUE}=== alt.image-parse 安装检测 ===${NC}\n"
+echo -e "${BLUE}=== alt-image-parse 安装检测 ===${NC}\n"
 
 # 检测操作系统
 detect_os() {
@@ -165,7 +165,7 @@ main() {
     echo -e "\n${BLUE}=== 安装验证 ===${NC}"
 
     if command -v bun &> /dev/null && [ -d "$SCRIPT_DIR/src/node_modules/sharp" ]; then
-        echo -e "${GREEN}✓ alt.image-parse 已就绪！${NC}"
+        echo -e "${GREEN}✓ alt-image-parse 已就绪！${NC}"
         echo -e "\n使用方法:"
         echo -e "  $SCRIPT_DIR/img-parse <图片路径> --type <类型>"
     else

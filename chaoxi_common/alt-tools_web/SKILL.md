@@ -1,9 +1,9 @@
 ---
-name: alt.tools_web
+name: alt-tools_web
 version: 2.0.0
 description: |
-  - 当你需要进行网络关键词搜索（非指定网站）：`alt.tools_web/web_search "关键词"`
-  - 当你需要读取某个 URL 的静态内容（非 SPA 前端渲染）：`alt.tools_web/web_fetch_md <url>`
+  - 当你需要进行网络关键词搜索（非指定网站）：`alt-tools_web/web_search "关键词"`
+  - 当你需要读取某个 URL 的静态内容（非 SPA 前端渲染）：`alt-tools_web/web_fetch_md <url>`
   - 当你需要访问并操作指定网站（包括 SPA 前端渲染网站）：优先使用opencli工具 (`opencli list` 了解详情)。其他 browser 工具作为 fallback。
   - 当你需要动态操作网站，并在后续固化成cli指令， 你可以参考：[opencli-operate.md](docs/opencli-operate.md)
 
