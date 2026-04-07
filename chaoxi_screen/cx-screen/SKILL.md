@@ -1,11 +1,11 @@
 ---
-name: cx.screen
+name: cx-screen
 description: |
   潮汐屏幕技能。短信验证码登录，支持多用户，屏幕绑定与内容投放。
 
   **什么时候使用**：
-  - 用户要求使用 cx.screen 相关功能
-  - 用户提到"潮汐"、"屏幕"、"cx.screen"、投放图片、投放 HTML、屏幕快照
+  - 用户要求使用 cx-screen 相关功能
+  - 用户提到"潮汐"、"屏幕"、"cx-screen"、投放图片、投放 HTML、屏幕快照
 
   **前置条件**：用户先完成登录认证并绑定屏幕，才能使用投放功能。
 
@@ -17,7 +17,7 @@ metadata:
       bins: ["node"]
 ---
 
-# cx.screen — 认证与屏幕管理
+# cx-screen — 认证与屏幕管理
 
 通过短信验证码登录，绑定屏幕后可投放图片/HTML、查询快照。支持多用户，按调用者 ID 隔离。
 
@@ -31,7 +31,7 @@ metadata:
 
 实际路径（当前 workspace）：
 ```
-/home/linaro/.copaw/workspaces/default/skills/cx.screen/cx-screen
+/home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen
 ```
 
 执行器：`node cli.js`（Node.js ESM 模式，无需 tsx）
@@ -66,10 +66,10 @@ metadata:
 {skill}/cx-screen <command> [args]
 
 # 例：检查登录状态
-/home/linaro/.copaw/workspaces/default/skills/cx.screen/cx-screen check --user default
+/home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen check --user default
 
 # 例：投图片（已绑定屏幕时直接用）
-/home/linaro/.copaw/workspaces/default/skills/cx.screen/cx-screen play-image /path/to/image.png --user default
+/home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen play-image /path/to/image.png --user default
 ```
 
 ---

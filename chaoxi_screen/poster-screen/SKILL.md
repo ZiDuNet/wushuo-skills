@@ -71,7 +71,7 @@ metadata:
 
 ```bash
 # 屏幕绑定文件路径
-BIND_FILE="/home/linaro/.copaw/workspaces/default/skills/cx.screen/.auth/default.bind.json"
+BIND_FILE="/home/linaro/.copaw/workspaces/default/skills/cx-screen/.auth/default.bind.json"
 
 # 读取 direction
 DIRECTION=$(cat "$BIND_FILE" | grep -o '"direction":"[^"]*"' | cut -d'"' -f4)
@@ -130,7 +130,7 @@ import sys
 os.environ['DISPLAY'] = ':0'
 
 # 读取绑定文件获取方向
-bind_file = '/home/linaro/.copaw/workspaces/default/skills/cx.screen/.auth/default.bind.json'
+bind_file = '/home/linaro/.copaw/workspaces/default/skills/cx-screen/.auth/default.bind.json'
 try:
     with open(bind_file, 'r') as f:
         bind_info = json.load(f)
@@ -382,7 +382,7 @@ python3 scripts/recalc.py  # 用于公式重算
 | 尺寸自动 | 根据绑定屏幕的 direction 自动选择 9:16 或 16:9 |
 | emoji | 避免！统一用 Unicode 符号 |
 | cx-screen user | 固定 `default` |
-| 鉴权文件 | `/skills/cx.screen/.auth/default.json` |
+| 鉴权文件 | `/skills/cx-screen/.auth/default.json` |
 | 投屏前 | 必须截图发给用户确认 |
 | 支持格式 | PDF、PPT、图片、纯文字、URL网页 |
 | **图片识别** | 用 alt.image-parse 的 `chat` 模式提取聊天内容 |
