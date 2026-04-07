@@ -140,7 +140,7 @@ data/{conferenceId}/
 
 **缓存策略：**
 - `load-catalog` 首次执行时缓存会议的 catalog
-- 进行中的会议：只缓存 catalog，演讲详情按需下载
+- **进行中的会议**：每次 `use-presentation` 前自动刷新 catalog（演讲可能在实时更新）
 - 已结束的会议：首次加载时自动下载全部演讲详情
 - `--refresh` 强制重新从 API 拉取并覆盖本地缓存
 - AI 联想匹配直接在 load-catalog 返回的数据上进行，不触发额外下载

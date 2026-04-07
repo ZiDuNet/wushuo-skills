@@ -176,6 +176,16 @@ async function handleUsePresentation(args) {
   const confId = values.conf || cache.findPresentation(presId)?.conferenceId;
   if (!confId) outputError(`演讲 ${presId} 不存在`, "请确认 presId 正确，或通过 load-catalog 先加载会议目录");
 
+  // 进行中的会议：自动刷新 catalog（演讲可能在更新）
+  if (cache.isConferenceLiveCached(confId)) {
+    process.stderr.write(`会议进行中，正在刷新目录...\n`);
+    const catalogResult = await auth.loadConferenceCatalog(callerUser, confId);
+    if (catalogResult.ok) {
+      await cache.loadConference(confId, catalogResult.presentations || []);
+      process.stderr.write(`目录已刷新\n`);
+    }
+  }
+
   const result = await cache.usePresentation(confId, presId);
   if (!result.ok) outputError(result.message);
   output({ ...result, conferenceId: confId });

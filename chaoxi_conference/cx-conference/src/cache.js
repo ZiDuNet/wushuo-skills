@@ -56,13 +56,25 @@ function writeJson(path, data) {
 // ─── Live Detection ──────────────────────────────────
 
 /** 判断会议是否正在进行中（任一演讲在 24 小时内开始） */
-function isConferenceLive(presentations) {
+export function isConferenceLive(presentations) {
   const now = Date.now();
   const oneDay = 24 * 60 * 60 * 1000;
   return presentations.some((p) => {
     const start = new Date(p.planStart).getTime();
     return Math.abs(now - start) < oneDay;
   });
+}
+
+/** 根据 cache-meta.json 判断缓存的会议是否 live */
+export function isConferenceLiveCached(conferenceId) {
+  const meta = readJson(cacheMetaPath(conferenceId));
+  if (!meta) return false;
+  // meta 中直接存了 isLive 标记
+  if (meta.isLive !== undefined) return meta.isLive;
+  // fallback：读 catalog 判断
+  const catalog = readJson(catalogPath(conferenceId));
+  if (!catalog) return false;
+  return isConferenceLive(catalog);
 }
 
 // ─── Download ────────────────────────────────────────
