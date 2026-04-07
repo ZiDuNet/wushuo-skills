@@ -32,33 +32,17 @@ echo -e "操作系统: ${GREEN}$OS${NC}"
 ARCH=$(uname -m)
 echo -e "系统架构: ${GREEN}$ARCH${NC}\n"
 
-# 1. 检测 bun
-check_bun() {
-    echo -e "${BLUE}[1/3] 检测 Bun...${NC}"
-    if command -v bun &> /dev/null; then
-        BUN_VERSION=$(bun --version)
-        echo -e "  ${GREEN}✓ Bun 已安装${NC} (v$BUN_VERSION)"
+# 1. 检测 Node.js
+check_node() {
+    echo -e "${BLUE}[1/3] 检测 Node.js...${NC}"
+    if command -v node &> /dev/null; then
+        NODE_VERSION=$(node --version)
+        echo -e "  ${GREEN}✓ Node.js 已安装${NC} ($NODE_VERSION)"
         return 0
     else
-        echo -e "  ${YELLOW}✗ Bun 未安装${NC}"
+        echo -e "  ${RED}✗ Node.js 未安装${NC}"
         return 1
     fi
-}
-
-# 安装 bun
-install_bun() {
-    echo -e "${YELLOW}  正在安装 Bun...${NC}"
-    case "$OS" in
-        macos|linux)
-            curl -fsSL https://bun.sh/install | bash
-            echo -e "  ${GREEN}✓ Bun 安装完成${NC}"
-            echo -e "  ${YELLOW}  请运行 'source ~/.bashrc' 或重新打开终端${NC}"
-            ;;
-        *)
-            echo -e "  ${RED}  请手动安装 Bun: https://bun.sh/docs/installation${NC}"
-            exit 1
-            ;;
-    esac
 }
 
 # 2. 检测项目依赖
@@ -90,11 +74,11 @@ install_dependencies() {
     # 清理旧依赖（如果存在）
     if [ -d "node_modules" ]; then
         echo -e "  ${YELLOW}  清理旧依赖...${NC}"
-        rm -rf node_modules bun.lockb
+        rm -rf node_modules package-lock.json
     fi
 
     # 安装依赖
-    bun install
+    npm install
 
     if [ -d "node_modules/sharp" ]; then
         echo -e "  ${GREEN}✓ 依赖安装完成${NC}"
@@ -118,12 +102,13 @@ check_env() {
 
 # 主流程
 main() {
-    local need_bun=false
     local need_deps=false
 
-    # 检测 bun
-    if ! check_bun; then
-        need_bun=true
+    # 检测 Node.js
+    if ! check_node; then
+        echo -e "\n${RED}Node.js 是必需的，请先安装 Node.js 24+${NC}"
+        echo -e "${YELLOW}  下载地址: https://nodejs.org/${NC}"
+        exit 1
     fi
 
     # 检测依赖
@@ -135,36 +120,23 @@ main() {
     check_env
 
     # 如果需要安装
-    if [ "$need_bun" = true ] || [ "$need_deps" = true ]; then
+    if [ "$need_deps" = true ]; then
         echo -e "\n${YELLOW}需要安装缺失的组件${NC}"
 
-        if [ "$need_bun" = true ]; then
-            echo -e "\n是否安装 Bun? [Y/n]"
-            read -r response
-            if [[ "$response" =~ ^([yY][eE][sS]|[yY]|"$") ]]; then
-                install_bun
-            else
-                echo -e "${RED}Bun 是必需的，请手动安装后重试${NC}"
-                exit 1
-            fi
-        fi
-
-        if [ "$need_deps" = true ]; then
-            echo -e "\n是否安装项目依赖? [Y/n]"
-            read -r response
-            if [[ "$response" =~ ^([yY][eE][sS]|[yY]|"$") ]]; then
-                install_dependencies
-            else
-                echo -e "${RED}项目依赖是必需的，请手动安装后重试${NC}"
-                exit 1
-            fi
+        echo -e "\n是否安装项目依赖? [Y/n]"
+        read -r response
+        if [[ "$response" =~ ^([yY][eE][sS]|[yY]|"") ]]; then
+            install_dependencies
+        else
+            echo -e "${RED}项目依赖是必需的，请手动安装后重试${NC}"
+            exit 1
         fi
     fi
 
     # 最终检测
     echo -e "\n${BLUE}=== 安装验证 ===${NC}"
 
-    if command -v bun &> /dev/null && [ -d "$SCRIPT_DIR/src/node_modules/sharp" ]; then
+    if command -v node &> /dev/null && [ -d "$SCRIPT_DIR/src/node_modules/sharp" ]; then
         echo -e "${GREEN}✓ alt-image-parse 已就绪！${NC}"
         echo -e "\n使用方法:"
         echo -e "  $SCRIPT_DIR/img-parse <图片路径> --type <类型>"

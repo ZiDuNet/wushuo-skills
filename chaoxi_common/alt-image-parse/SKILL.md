@@ -19,7 +19,7 @@ metadata:
   openclaw:
     emoji: "🖼️"
     requires:
-      bins: ["bun"]
+      bins: ["node"]
       env: ["DASHSCOPE_API_KEY", "ALIYUN_CODING_KEY", "MINIMAX_CODING_KEY"]
 ---
 
@@ -167,20 +167,18 @@ metadata:
 ```
 
 安装脚本会自动检测并安装：
-- Bun 运行时
 - Sharp 图像处理库
 - 其他必要依赖
+
+**前置要求**：Node.js 24+（支持直接运行 TypeScript）
 
 ### 手动安装
 
 如果自动安装失败，可手动执行：
 
 ```bash
-# 安装 Bun（如未安装）
-curl -fsSL https://bun.sh/install | bash
-
 # 安装项目依赖
-cd {skill-folder}/src && bun install
+cd {skill-folder}/src && npm install
 ```
 
 ### 环境变量

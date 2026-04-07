@@ -10,7 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "lib": ["ESNext"],
-    "types": ["bun"]
+    "types": ["node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

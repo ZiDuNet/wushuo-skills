@@ -2,8 +2,12 @@
 
 import sharp from "sharp";
 import { mkdir, unlink } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { ProviderConfig } from "./config.ts";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export interface SliceResult {
   needsSlicing: boolean;
@@ -56,7 +60,7 @@ export async function analyzeAndSlice(options: SliceOptions): Promise<SliceResul
   const splitHeight = Math.ceil(height / splitCount);
 
   // 创建临时目录
-  const tempDir = join(import.meta.dir, "../.img-parse-temp");
+  const tempDir = join(__dirname, "../.img-parse-temp");
   await mkdir(tempDir, { recursive: true });
 
   const slices: string[] = [];

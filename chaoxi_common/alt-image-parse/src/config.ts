@@ -1,8 +1,15 @@
 // 配置 - 从 ../config.json 读取
 
-import config from "../config.json";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 手动读取 JSON 文件（Node.js 24 需要）
+const configPath = join(__dirname, "../config.json");
+const config = JSON.parse(readFileSync(configPath, "utf-8"));
 
 type ProviderConfig = {
   name: string;
@@ -68,7 +75,7 @@ export function getPrompt(type: string = "default"): string {
   }
 
   // 优先查找 prompts/ 目录（新版）
-  const promptsDir = join(import.meta.dir, "../prompts");
+  const promptsDir = join(__dirname, "../prompts");
   if (existsSync(promptsDir)) {
     const promptFile = join(promptsDir, `${type.toLowerCase()}.md`);
     if (existsSync(promptFile)) {
@@ -87,7 +94,7 @@ export function getPrompt(type: string = "default"): string {
   }
 
   // fallback 到旧的 prompt 目录
-  const oldPromptPath = join(import.meta.dir, "../prompt/WHOLE_IMG.MD");
+  const oldPromptPath = join(__dirname, "../prompt/WHOLE_IMG.MD");
   if (existsSync(oldPromptPath)) {
     const content = readFileSync(oldPromptPath, "utf-8");
     promptCache.set(cacheKey, content);
@@ -101,7 +108,7 @@ export function getPrompt(type: string = "default"): string {
  * 获取可用的提示词类型列表
  */
 export function getAvailablePromptTypes(): string[] {
-  const promptsDir = join(import.meta.dir, "../prompts");
+  const promptsDir = join(__dirname, "../prompts");
   if (!existsSync(promptsDir)) {
     return ["default"];
   }

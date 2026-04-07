@@ -2,6 +2,7 @@
 // VLM: Coding Plan 专用接口（硬编码）
 // LLM: OpenAI 兼容接口（用 config 里的 baseUrl）
 
+import { readFileSync } from "node:fs";
 import { getApiKey, getBaseUrl, getPrompt } from "../config.ts";
 import type { ProviderConfig } from "../config.ts";
 
@@ -25,7 +26,7 @@ const VLM_ENDPOINT = "https://api.minimaxi.com/v1/coding_plan/vlm";
 async function readImageAsBase64(imagePath: string): Promise<string> {
   const ext = imagePath.split(".").pop()?.toLowerCase() || "jpg";
   const mimeType = ext === "jpg" ? "jpeg" : ext === "png" ? "png" : ext;
-  const data = await Bun.file(imagePath).arrayBuffer();
+  const data = readFileSync(imagePath);
   const bytes = new Uint8Array(data);
   let binary = "";
   for (let i = 0; i < bytes.length; i++) {

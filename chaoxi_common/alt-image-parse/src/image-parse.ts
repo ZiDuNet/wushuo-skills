@@ -1,18 +1,21 @@
-#!/usr/bin/env bun
-
+#!/usr/bin/env node
 // Image Parse CLI - 图片分析主入口
 
 import { parseArgs } from "node:util";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import { getAvailableProviders, getProvidersByName, hasEnvKeys, SLICER } from "./config.ts";
 import { analyzeAndSlice } from "./slicer.ts";
 import { analyze as analyzeQwen } from "./provider/qwen.ts";
 import { analyze as analyzeMinimax } from "./provider/minimax-coding.ts";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const HELP = `
-用法: bun image-parse.ts <图片路径> [options]
+用法: node image-parse.ts <图片路径> [options]
 
 必填:
   <图片路径>        本地图片文件路径或 URL
@@ -59,11 +62,11 @@ async function downloadToTemp(url: string): Promise<string> {
   const buffer = await response.arrayBuffer();
   const ext = new URL(url).pathname.split(".").pop() || "jpg";
   const filename = `parse_${Date.now()}.${ext}`;
-  const tempDir = join(import.meta.dir, "../.img-parse-temp");
+  const tempDir = join(__dirname, "../.img-parse-temp");
   await mkdir(tempDir, { recursive: true });
 
   const tempPath = join(tempDir, filename);
-  await Bun.write(tempPath, Buffer.from(buffer));
+  writeFileSync(tempPath, Buffer.from(buffer));
 
   return tempPath;
 }
@@ -71,7 +74,7 @@ async function downloadToTemp(url: string): Promise<string> {
 async function main() {
   // 解析参数
   const { values, positionals } = parseArgs({
-    args: Bun.argv.slice(2),
+    args: process.argv.slice(2),
     options: {
       help: { type: "boolean", short: "h" },
       type: { type: "string", default: "default" },

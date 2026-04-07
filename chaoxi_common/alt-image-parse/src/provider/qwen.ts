@@ -1,5 +1,6 @@
 // Qwen Provider - 图片分析（支持两阶段处理）
 
+import { readFileSync } from "node:fs";
 import { getApiKey, getBaseUrl, getPrompt } from "../config.ts";
 import type { ProviderConfig } from "../config.ts";
 
@@ -21,7 +22,7 @@ export interface AnalyzeResult {
 async function readImageAsBase64(imagePath: string): Promise<string> {
   const ext = imagePath.split(".").pop()?.toLowerCase() || "jpg";
   const mimeType = ext === "jpg" ? "jpeg" : ext === "png" ? "png" : ext;
-  const data = await Bun.file(imagePath).arrayBuffer();
+  const data = readFileSync(imagePath);
 
   const blob = new Blob([data]);
   const dataUrl = await new Response(blob).arrayBuffer();

@@ -3,4 +3,4 @@
 # 用法: ./img-parse <prompt> [options]
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec bun "$SCRIPT_DIR/src/image-parse.ts" "$@"
+exec node --experimental-strip-types "$SCRIPT_DIR/src/image-parse.ts" "$@"
