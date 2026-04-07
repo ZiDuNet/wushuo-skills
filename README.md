@@ -13,7 +13,7 @@ chaoxi_skills/
 ├── chaoxi_conference/             # 潮汐会议数据服务
 │   └── cx-conference/            # 会议演讲数据获取      v0.0.10
 ├── chaoxi_screen/                 # 潮汐智慧屏
-│   ├── cx.screen/                # 屏幕管理与内容投放    v1.0.0
+│   ├── cx-screen/                # 屏幕管理与内容投放    v1.0.0
 │   ├── post-creator/             # HTML 海报生成         v2.0.0
 │   └── poster-screen/            # 海报生成与投屏        v2.0.0
 ├── _devtools/                     # 内部开发工具（不面向终端用户）
@@ -39,7 +39,7 @@ chaoxi_skills/
 
 **流程**：确认风格 → 确定标题 → 生成 Markdown → 用户确认 → 渲染微信 HTML → 可选推送
 
-### cx.screen `v1.0.0`
+### cx-screen `v1.0.0`
 
 > 潮汐智慧屏管理
 

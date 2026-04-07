@@ -1,0 +1,30 @@
+# 自动检测文本文件并规范化换行符
+* text=auto
+
+# 脚本文件强制 LF
+*.sh text eol=lf
+install text eol=lf
+img-parse text eol=lf
+cx-screen text eol=lf
+web_fetch_md text eol=lf
+web_search text eol=lf
+
+# JS/TS 源码用 LF
+*.js text eol=lf
+*.ts text eol=lf
+*.mjs text eol=lf
+
+# 配置文件用 LF
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+
+# 二进制文件不转换
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
