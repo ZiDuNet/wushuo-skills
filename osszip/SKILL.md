@@ -46,7 +46,7 @@ clawhub install find-skills         # skill 搜索发现
 clawhub install playwright-scraper  # 网页抓取（poster-screen 依赖）
 npm install -g agent-browser
 agent-browser install --with-deps
-
+sudo npm install -g defuddle
 npm install -g @jackwener/opencli
 npm install -g bun --registry=https://registry.npmmirror.com`
 
