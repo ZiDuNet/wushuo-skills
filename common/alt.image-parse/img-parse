@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Image Parse - 启动脚本
+# 用法: ./img-parse <prompt> [options]
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec bun "$SCRIPT_DIR/src/image-parse.ts" "$@"

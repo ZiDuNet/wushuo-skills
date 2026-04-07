@@ -1,0 +1,30 @@
+{
+  "providers": [
+    {
+      "name": "qwen",
+      "envKeys": ["ALIYUN_CODING_KEY"],
+      "baseUrl": "https://coding.dashscope.aliyuncs.com/v1",
+      "model": "qwen3.5-plus",
+      "vlModel": "qwen3.5-plus",
+      "pixels": { "default": 2621440, "max": 16777216 }
+    },
+    {
+      "name": "qwen",
+      "envKeys": ["DASHSCOPE_API_KEY"],
+      "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen3.5-plus",
+      "vlModel": "qwen3-vl-plus",
+      "pixels": { "default": 2621440, "max": 16777216 }
+    },
+    {
+      "name": "minimax-coding",
+      "envKeys": ["MINIMAX_CODING_KEY"],
+      "pixels": { "default": 2621440, "max": 16777216 },
+      "model": "MiniMax-M2.7",
+      "baseUrl": "https://api.minimaxi.com/v1"
+    }
+  ],
+  "slicer": {
+    "overlap": 300
+  }
+}
