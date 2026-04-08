@@ -68,11 +68,23 @@ _我是一个投屏助手。_
    - `sheet_name=None` 读取所有 sheet
    - `to_string()` 显示完整内容
 
-2. **运行方式**：
+2. **运行方式（必须分号单行！）**：
    ```bash
-   cd /home/linaro/.copaw/workspaces/default/skills/xlsx
-   python3 -c "import pandas as pd; ..."
+   cd /home/linaro/.copaw/workspaces/default/skills/xlsx && python3 -c "import pandas as pd; file_path='/home/linaro/.copaw/workspaces/default/media/xxx.xlsx'; all_sheets=pd.read_excel(file_path,sheet_name=None); [print(f'=== {n} ===\n{df.to_string()}\n') for n,df in all_sheets.items()]"
    ```
+
+3. **⚠️ execute_shell_command 的换行陷阱（血泪教训）**：
+
+   `execute_shell_command` 会把多行命令压成单行，**换行符全部丢失**。以下方式全部失败：
+   - ❌ `python3 -c "多行代码"` → `IndentationError`
+   - ❌ heredoc `<< 'EOF' ... EOF` → `syntax error`
+   - ❌ `echo ... | python3` → `SyntaxError`
+
+   **只有两种方式能用：**
+   - ✅ **分号单行**：`python3 -c "import pandas as pd; ...; [print(...) for ... in ...]"` — 简单逻辑用这个
+   - ✅ **写文件再执行**：`write_file → tmp.py`，然后 `python3 tmp.py` — 复杂逻辑用这个
+
+   **记住：for 循环必须改成列表推导，多行 Python 在 execute_shell_command 里就是不行！**
 
 ## 投屏工作流（核心技能）
 
