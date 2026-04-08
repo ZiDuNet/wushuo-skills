@@ -1,15 +1,15 @@
 ---
 name: poster-screen
 description: |
-  海报生成与智慧屏投放工作流。用户上传素材（PDF/PPT/图片/文字），根据已绑定屏幕的方向
-  生成对应比例的海报（横屏16:9或竖屏9:16），截图预览确认后，投放至潮汐智慧屏。
+   海报生成与智慧屏投放工作流。用户上传素材（PDF/PPT/图片/文字），根据已绑定屏幕的方向
+   生成对应比例的海报（横屏16:9或竖屏9:16），截图预览确认后，投放至潮汐智慧屏。
 
 version: 2.0.0
 metadata:
-  openclaw:
-    emoji: "🖼️"
-    requires:
-      bins: ["playwright"]
+   openclaw:
+      emoji: "🖼️"
+      requires:
+         bins: ["node"]
 ---
 
 # poster_screen — 海报投屏工作流
@@ -46,8 +46,8 @@ metadata:
    └─ 避免 emoji，用 Unicode 符号（⚡🔋✦○●▸）
 
 4. 截图预览
-   └─ playwright headless 模式
-   └─ viewport 根据屏幕方向设置 长边1920 短边1020
+   └─ 使用 browser_use headed=true 模式（不要用 Python Playwright！）
+   └─ viewport 根据屏幕方向：竖屏(1080,1920) / 横屏(1920,1080)
    └─ 截图路径：/home/linaro/.copaw/workspaces/default/poster_preview.png
    └─ 发送给用户确认
 
@@ -91,81 +91,78 @@ echo "屏幕方向: $DIRECTION"
 
 ```json
 {
-  "screenId": "e808dc48ab3afd42",
-  "direction": "竖屏",
-  "boundAt": 1775212339698
+   "screenId": "e808dc48ab3afd42",
+   "direction": "竖屏",
+   "boundAt": 1775212339698
 }
 ```
 
----
+## 第二步：使用 browser_use 截图预览
 
-## 第二步：根据方向设置尺寸
+### ⚠️ 踩坑记录（重要！）
+
+| 坑 | 现象 | 原因 | 解法 |
+|----|------|------|------|
+| Playwright 内置浏览器缺失 | `Executable doesn't exist at .../ms-playwright/chromium-xxx` | 系统未执行 `playwright install`，无内置 Chromium | **不要用 Python playwright**，改用 browser_use |
+| 系统 Chromium + Python Playwright | `TargetClosedError: Target page, context or browser has been closed` | 系统 Chromium 版本与 Playwright 不兼容 | **不要用 Python playwright**，改用 browser_use |
+| browser_use headless 模式 | `FATAL:platform_selection.cc(50) Invalid ozone platform: headless` | Debian + 系统 Chromium 不支持 Playwright 的 headless ozone 模式 | **必须用 headed=true** 启动浏览器 |
+| DISPLAY 环境变量 | headed 模式启动失败 | 需要 X11 display | 确保 `DISPLAY=:0` 已设置 |
+
+### ✅ 正确的截图流程
+
+**核心原则：用 browser_use headed 模式截图，不要用 Python Playwright 直接调。**
 
 ```python
-# 根据方向确定海报尺寸
-if direction == "竖屏":
-    WIDTH = 1080
-    HEIGHT = 1920
-    RATIO = "9:16"
-else:  # 横屏
-    WIDTH = 1920
-    HEIGHT = 1080
-    RATIO = "16:9"
+# 步骤 1：启动浏览器（必须 headed=true！）
+browser_use(action="start", headed=True)
 
-viewport = {'width': WIDTH, 'height': HEIGHT}
+# 步骤 2：打开海报 HTML
+browser_use(action="open", url="file:///home/linaro/.copaw/workspaces/default/poster.html")
+
+# 步骤 3：设置 viewport（根据屏幕方向）
+#   竖屏 9:16 → width: 1080, height: 1920
+#   横屏 16:9 → width: 1920, height: 1080
+browser_use(action="resize", width=1080, height=1920)  # 竖屏示例
+
+# 步骤 4：全页截图
+browser_use(action="screenshot", path="/home/linaro/.copaw/workspaces/default/poster_preview.png", full_page=True)
+
+# 步骤 5：发送给用户确认
+send_file_to_user(file_path="/home/linaro/.copaw/workspaces/default/poster_preview.png")
 ```
 
----
-
-## 第三步：playwright 截图代码
+### ❌ 不要这样做
 
 ```python
-export DISPLAY=:0
-python3 -c "
+# 错误 1：用 Python playwright 直接调（浏览器缺失或版本不兼容）
 from playwright.sync_api import sync_playwright
-import os
-import json
-import sys
+browser = p.chromium.launch(headless=True)  # 崩！
 
-os.environ['DISPLAY'] = ':0'
+# 错误 2：指定 executable_path 用系统 chromium（TargetClosedError）
+browser = p.chromium.launch(executable_path='/usr/bin/chromium')  # 崩！
 
-# 读取绑定文件获取方向
-bind_file = '/home/linaro/.copaw/workspaces/default/skills/cx-screen/.auth/default.bind.json'
-try:
-    with open(bind_file, 'r') as f:
-        bind_info = json.load(f)
-        direction = bind_info.get('direction', '竖屏')
-except:
-    direction = '竖屏'  # 默认竖屏
+# 错误 3：browser_use 默认 headless 模式（Invalid ozone platform）
+browser_use(action="start")  # 默认 headless，在 Debian 上崩！
 
-# 根据方向设置 viewport
-if direction == '横屏':
-    WIDTH, HEIGHT = 1920, 1080
-else:
-    WIDTH, HEIGHT = 1080, 1920
-
-with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False, args=['--no-sandbox'])
-    page = browser.new_page(viewport={'width': WIDTH, 'height': HEIGHT})
-    page.goto('file:///path/to/poster.html')
-    page.wait_for_timeout(1000)
-    page.screenshot(path='/home/linaro/.copaw/workspaces/default/poster_preview.png', full_page=True)
-    browser.close()
-    
-print(f'截图完成: {WIDTH}x{HEIGHT} ({direction})')
-"
+# 错误 4：viewport 尺寸写反
+browser_use(action="resize", width=1920, height=1080)  # 竖屏时写反了！
 ```
 
----
+### 截图视口尺寸
+
+| 屏幕方向 | resize 参数 | 截图路径 |
+|---------|------------|---------|
+| 竖屏 9:16 | width: 1080, height: 1920 | poster_preview.png |
+| 横屏 16:9 | width: 1920, height: 1080 | poster_preview.png |
 
 ## cx-screen 投屏命令
 
 ```bash
 # 投图片（推荐）
-cx-screen play-image <img_path> --user default
+node /home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen play-image <img_path> --user default
 
 # 投 HTML（暂不可用）
-# cx-screen play-html <html_path> --user default
+# node /home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen play-html <html_path> --user default
 
 # 注意：user 固定用 default
 # 直接运行，无需检查登录状态
@@ -264,26 +261,42 @@ python3 scripts/recalc.py  # 用于公式重算
 
 **场景**：用户上传聊天截图、宣传图等，需要从中提取文字内容制作海报。
 
+### 核心规则
+
+**必须且只能使用 alt-image-parse 技能识别图片，禁止用 browser_use / playwright 截图等其他方式。**
+
 ### 识别流程
 
 1. **确认图片路径**：用户上传文件会下载到 `/home/linaro/.copaw/workspaces/default/media/`
 
-2. **使用 alt.image-parse 识别**：
+2. **使用 alt-image-parse 识别**：
    ```bash
-   bash /home/linaro/.copaw/workspaces/default/skills/alt.image-parse/img-parse <图片路径> --type chat
+   bash /home/linaro/.copaw/workspaces/default/skills/alt-image-parse/img-parse <图片路径> --type chat
    ```
-   - `--type chat`：聊天记录、对话截图
-   - `--type ocr`：文档、纯文字提取
-   - `--type default`：通用图片分析
+   - **无特别要求时，优先使用 `--type chat`**：聊天截图、对话记录、AI助手界面截图等都能处理，提取关键信息的能力最全面
+   - `--type ocr`：文档扫描、合同票据等纯文字图片
+   - `--type marketing`：广告海报、宣传物料的设计分析
+   - `--type default`：通用兜底，仅在无法判断图片类型时使用
 
 3. **识别后提取关键信息**：
    - 聊天记录 → 找核心诉求（如：领导要求显示的文字）
+   - AI 助手截图 → 提取任务内容、屏幕方向、文案等关键参数
    - 宣传图 → 提取标题、日期、地点等结构化信息
    - 优先提取用户实际需要的文案，而非聊天上下文
 
 4. **示例**：
    - 用户上传聊天截图，群里有人说"请将一号屏更换为XXX"
    - → 识别后提取 "XXX" 作为海报内容
+   - 用户上传 AI 助手对话截图，其中包含"热烈欢迎XXX一行莅临指导"
+   - → 识别后提取欢迎文案和屏幕方向参数
+
+### 踩坑记录
+
+| 坑 | 现象 | 原因 | 解法 |
+|----|------|------|------|
+| 用 browser_use 打开图片 | 被用户打断，效率低 | browser_use 不是图片识别工具 | **必须用 alt-image-parse** |
+| type 选错 | 提取内容不精准 | 不同 type 有不同的专业分析框架 | **无特殊要求优先 chat**，chat 对各类截图都有较好的提取能力 |
+| 路径写错 | `file not found` | skill 文件夹名是 `alt-image-parse`（带连字符） | 确认路径：`skills/alt-image-parse/img-parse` |
 
 ### write_file 返回值说明
 
@@ -304,14 +317,8 @@ python3 scripts/recalc.py  # 用于公式重算
    └─ 屏幕方向：竖屏
    └─ 将生成竖屏海报 1080×1920 (9:16)
 
-2. 请提供海报内容：
-   - 主标题：？
-   - 副标题：？
-   - 其他信息：？
+2. 根据用户提供内容分析去确定海报内容画面布局及颜色风格
 
-用户：[提供内容]
-
-助手：
 3. 生成海报中...
    └─ Wrote 15.2 KB to poster.html
 
@@ -385,5 +392,5 @@ python3 scripts/recalc.py  # 用于公式重算
 | 鉴权文件 | `/skills/cx-screen/.auth/default.json` |
 | 投屏前 | 必须截图发给用户确认 |
 | 支持格式 | PDF、PPT、图片、纯文字、URL网页 |
-| **图片识别** | 用 alt.image-parse 的 `chat` 模式提取聊天内容 |
+| **图片识别** | **必须用 alt-image-parse**，禁止用 browser_use 等其他方式；无特别要求优先 `--type chat`；超时至少 600s |
 | **URL处理** | 用 browser_use 加载页面，提取标题/日期/正文制作海报 |

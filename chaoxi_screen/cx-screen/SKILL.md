@@ -66,10 +66,10 @@ metadata:
 {skill}/cx-screen <command> [args]
 
 # 例：检查登录状态
-/home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen check --user default
+node /home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen check --user default
 
 # 例：投图片（已绑定屏幕时直接用）
-/home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen play-image /path/to/image.png --user default
+node /home/linaro/.copaw/workspaces/default/skills/cx-screen/cx-screen play-image /path/to/image.png --user default
 ```
 
 ---

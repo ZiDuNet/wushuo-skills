@@ -45,7 +45,13 @@ fi
 
 mkdir -p "$CACHE_DIR"
 
-URL_HASH=$(printf '%s' "$URL" | md5 | awk '{print $1}')
+if command -v md5 &>/dev/null; then
+  URL_HASH=$(printf '%s' "$URL" | md5 | awk '{print $1}')
+elif command -v md5sum &>/dev/null; then
+  URL_HASH=$(printf '%s' "$URL" | md5sum | awk '{print $1}')
+else
+  URL_HASH=$(printf '%s' "$URL" | cksum | awk '{print $1}')
+fi
 CACHE_FILE="${CACHE_DIR}/${URL_HASH}.md"
 
 # Return cache if valid
