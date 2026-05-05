@@ -82,5 +82,7 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan gitee.com >> ~/.ssh/known_hosts 2>/dev/null
           git remote add gitee git@gitee.com:Shuo_wu/ppt-master.git
-          git push gitee main --force
+          # 推送所有分支和标签到 Gitee
+          git push gitee --force --all
+          git push gitee --force --tags
           echo "Synced to Gitee"
