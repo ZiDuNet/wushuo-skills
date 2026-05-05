@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git config *)",
+      "Bash(git ls-remote *)",
+      "Bash(curl -s --connect-timeout 10 https://github.com)"
+    ]
+  }
+}
