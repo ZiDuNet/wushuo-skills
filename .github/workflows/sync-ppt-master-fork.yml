@@ -73,16 +73,16 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Push to Gitee mirror
-        env:
-          GITEE_SSH_KEY: ${{ secrets.GITEE_SSH_KEY }}
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "$GITEE_SSH_KEY" > ~/.ssh/id_ed25519
+          echo "${{ secrets.GITEE_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan gitee.com >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Push to Gitee mirror
+        run: |
           git remote add gitee git@gitee.com:Shuo_wu/ppt-master.git
-          # 推送所有分支和标签到 Gitee
           git push gitee --force --all
           git push gitee --force --tags
           echo "Synced to Gitee"
