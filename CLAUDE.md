@@ -12,7 +12,7 @@
 1. 新增/修改/删除任何 skill 文件时，同步更新 `README.md` 中的 Skills 列表、目录结构、及相关说明
 2. 确保目录结构与实际文件一致
 3. 检查链接是否有效
-4. **对被修改的 skill，将其 SKILL.md frontmatter 中的 `version` 字段 +1**。没有 version 字段则新增并设为 1
+4. **对被修改的 skill，将其 SKILL.md frontmatter 中的 `version` 末位（patch）+1**（如 `1.0.0` → `1.0.1`）。没有 version 字段则新增并设为 `1.0.0`
 
 ## Git 远程
 

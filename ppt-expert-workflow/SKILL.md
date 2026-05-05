@@ -1,15 +1,75 @@
 ---
 name: ppt-expert-workflow
-version: 1
+version: 1.0.1
 description: >
   整合 DrawBookAI 专家工作流 + ppt-master 的混合 PPT 制作方法。
   先需求调研 → 资料检索 → 策划稿 → 卡片式SVG设计 → PPTX输出。
   当用户说"做PPT"、"生成PPT"、"制作演示文稿"时使用。
+repo: https://github.com/ZiDuNet/wushuo-skills/tree/master/ppt-expert-workflow
 ---
 
-# PPT 专家工作流 (Expert Workflow)
+# PPT 专家工作流 (Expert Workflow) v1.0.1
 
 > 整合 DrawBookAI 四步专家工作流 + ppt-master SVG→PPTX 管线
+
+## 🚀 启动检查（每次运行前执行）
+
+**执行顺序，任一步失败即中止：**
+
+### 1. 版本更新检测
+
+```bash
+# 检查 GitHub 上是否有新版本（HTTPS 不通时自动尝试 SSH）
+git ls-remote https://github.com/ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}' \
+  || git ls-remote git@github.com:ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}'
+```
+
+- 成功 → 比对本地版本，有新版本则提示用户更新
+- 失败（网络不通/GitHub 不可达）→ **静默跳过**，继续使用当前版本
+
+### 2. ppt-master 引擎检测与自动安装
+
+```bash
+# 检查 ppt-master 是否存在
+if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
+  echo "ppt-master 未安装，正在自动下载..."
+  git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+    || git clone git@github.com:hugohe3/ppt-master ~/.agents/skills/ppt-master
+  if [ $? -ne 0 ]; then
+    echo "❌ 关键依赖下载失败：ppt-master"
+    echo "   请确认本机能否访问 GitHub: https://github.com/hugohe3/ppt-master"
+    echo "   无法使用 ppt-expert-workflow，任务终止。"
+    exit 1
+  fi
+  echo "✅ ppt-master 安装完成"
+fi
+```
+
+- ppt-master 不存在 → 自动 `git clone` 安装
+- 下载失败 → **拦截使用**，提醒用户检查 GitHub 访问
+- 下载成功 → 继续
+
+### 3. 已安装则更新
+
+```bash
+if [ -d ~/.agents/skills/ppt-master/.git ]; then
+  cd ~/.agents/skills/ppt-master && git pull origin main 2>/dev/null || true
+fi
+```
+
+---
+
+## 依赖
+
+**唯一依赖：**
+
+| Skill | 安装 |
+|---|---|
+| ppt-master | 自动下载（HTTPS 优先，不通则走 SSH） |
+
+> 无其他依赖。无需安装 guizang-ppt-skill / html-ppt-skill / gpt-image2-ppt / huashu-slides。
+
+---
 
 ## 核心理念
 
@@ -96,59 +156,20 @@ description: >
 **执行方式**：用 ppt-master Step 6 Executor Phase 生成 SVG，但强制使用 Bento Grid 布局。
 
 ```bash
-# 使用 ppt-master 的命令
 python3 ~/.agents/skills/ppt-master/skills/ppt-master/scripts/project_manager.py init <project_name> --format ppt169
 ```
 
 然后按 ppt-master 流程：Strategist → Image_Generator → Executor → Post-processing → Export。
-
-**关键约束**：
-- SVG 输出必须用 Bento Grid 卡片式布局
-- 禁止套用僵硬模板
-- 每页 SVG 生成前先读 spec_lock.md
 
 ---
 
 ### Step 5: 输出与交付
 
 ```bash
-# 7.1 分割讲稿
 python3 scripts/total_md_split.py <project_path>
-
-# 7.2 SVG后处理
 python3 scripts/finalize_svg.py <project_path>
-
-# 7.3 导出PPTX
 python3 scripts/svg_to_pptx.py <project_path> -s final
 ```
-
----
-
-## 与其他 PPT Skill 的关系
-
-| Skill | 本工作流中的定位 |
-|---|---|
-| **ppt-master** | 管线引擎：SVG生成 + PPTX导出 |
-| **guizang-ppt-skill** | 特殊风格：电子墨水网页PPT（不常用） |
-| **html-ppt-skill** | HTML演示文稿（不常用） |
-| **gpt-image2-ppt** | 图片生成补充（需要AI插图时） |
-| **huashu-slides** | 端到端替代方案（18种风格） |
-
----
-
-## 安装依赖
-
-ppt-expert-workflow 依赖以下 skill，未安装时从对应仓库获取：
-
-| Skill | 必装 | 安装来源 | 安装方式 |
-|---|---|---|---|
-| **ppt-master** | ✅ 是 | https://github.com/hugohe3/ppt-master | `git clone` 到 `~/.agents/skills/ppt-master` |
-| **guizang-ppt-skill** | 否 | 已打包在本导出中 | 复制到 skills 目录 |
-| **html-ppt-skill** | 否 | 已打包在本导出中 | 复制到 skills 目录 |
-| **gpt-image2-ppt** | 否 | 已打包在本导出中 | 复制到 skills 目录 |
-| **huashu-slides** | 否 | 已打包在本导出中 | 复制到 skills 目录 |
-
-> ⚠️ **ppt-master 是核心引擎**，没有它 ppt-expert-workflow 无法出 PPTX。安装后确保 `~/.agents/skills/ppt-master/skills/ppt-master/scripts/` 可执行。
 
 ---
 
@@ -158,14 +179,14 @@ ppt-expert-workflow 依赖以下 skill，未安装时从对应仓库获取：
 2. **必须加策划稿环节**：在 Strategist 和 Executor 之间
 3. **强制 Bento Grid**：所有非模板页面默认用卡片式布局
 4. **先搜索后设计**：无源材料时，先 web_search 获取行业数据
-5. **用户是总监，AI 是专家团队**：信息充分时不中断确认，直接推进；仅在方向模糊（缺少受众/用途/主题边界）时才提问
-6. **快速通道**：当用户明确给出了受众（如"对外展示"）、主题边界清晰时，**跳过八项确认**，按以下默认值直接推进：
-   - 对外展示/投资人/媒体 → B) General Consulting 风格
-   - 内部汇报/管理层 → C) Top Consulting 风格
-   - 科技/互联网品牌 → 品牌主色 + 深色底 + 白
+5. **用户是总监，AI 是专家团队**：信息充分时不中断确认，直接推进
+6. **快速通道**：当用户明确给出了受众（如"对外展示"）时，跳过八项确认，默认值：
+   - 对外展示 → B) General Consulting
+   - 内部汇报 → C) Top Consulting
+   - 科技品牌 → 品牌主色 + 深色底 + 白
    - 数据密集型 → body 18px，无图片
-   - 图标 → tabler-filled（圆润科技感）
-   - 画布 → ppt169 (16:9)
+   - 图标 → tabler-filled
+   - 画布 → ppt169
 
 ## 参考案例
 
@@ -174,7 +195,6 @@ ppt-expert-workflow 依赖以下 skill，未安装时从对应仓库获取：
 - 卡片面：`#1E1E36` / `#FFFFFF`
 - 字体：Microsoft YaHei，body 18px，title 36px，hero 48px
 - 布局：Bento Grid 卡片式，暗黑科技风
-- 数据来源：web_search 实时检索（新浪财经、MarkLines、高盛等）
 
 ---
 
