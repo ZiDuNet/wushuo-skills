@@ -22,8 +22,7 @@
 5. **输出交付** — SVG 后处理 → PPTX 导出
 
 **依赖关系**：
-- **ppt-master**（必装）— 核心引擎，SVG 生成 + PPTX 导出
-- guizang-ppt-skill、html-ppt-skill、gpt-image2-ppt、huashu-slides（可选）
+- **ppt-master**（必装）— 核心引擎，自动从 [ZiDuNet/ppt-master](https://github.com/ZiDuNet/ppt-master) fork 安装，通过 Actions 每日同步上游
 
 详见 [ppt-expert-workflow/SKILL.md](ppt-expert-workflow/SKILL.md)。
 
@@ -31,12 +30,15 @@
 
 ```
 wushuo-skills/
-├── README.md                      # 本文件（维基）
-├── CLAUDE.md                      # Claude Code 项目指令
+├── README.md                          # 本文件（维基）
+├── CLAUDE.md                          # Claude Code 项目指令
 ├── .claude/
-│   └── settings.local.json        # 项目权限配置
+│   └── settings.local.json            # 项目权限配置
+├── .github/
+│   └── workflows/
+│       └── sync-ppt-master-fork.yml   # 定时同步 ppt-master fork
 └── ppt-expert-workflow/
-    └── SKILL.md                   # PPT 专家工作流定义
+    └── SKILL.md                       # PPT 专家工作流定义
 ```
 
 ## 安装

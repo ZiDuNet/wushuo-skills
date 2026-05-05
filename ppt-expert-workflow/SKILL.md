@@ -3,7 +3,7 @@ name: ppt-expert-workflow
 version: 1.0.2
 description: >
   整合 DrawBookAI 专家工作流 + ppt-master 的混合 PPT 制作方法。
-  先需求调研 → 资料检索 → 策划稿 → 卡片式SVG设计 → PPTX输出。
+  环境检查 → 读取材料 → 需求调研 → 策划稿 → 卡片式SVG设计 → PPTX输出。
   当用户说"做PPT"、"生成PPT"、"制作演示文稿"时使用。
 repo: https://github.com/ZiDuNet/wushuo-skills/tree/master/ppt-expert-workflow
 ---
@@ -12,48 +12,56 @@ repo: https://github.com/ZiDuNet/wushuo-skills/tree/master/ppt-expert-workflow
 
 > 整合 DrawBookAI 四步专家工作流 + ppt-master SVG→PPTX 管线
 
-## 🚀 启动检查（每次运行前执行）
+## 🚀 启动检查（每次运行前必须执行，不可跳过）
 
-**执行顺序，任一步失败即中止：**
+> **ppt-master 是硬性依赖，没有它整个工作流无法运行。环境检查失败 = 任务中止，不进入任何内容步骤。**
 
-### 1. 版本更新检测
+### 1. ppt-master 引擎检测与自动安装（必须通过）
 
-```bash
-# 按优先级尝试：GitHub HTTPS → Gitee/AtomGit HTTPS → GitHub SSH
-git ls-remote https://github.com/ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}' \
-  || git ls-remote https://gitee.com/ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}' \
-  || git ls-remote git@github.com:ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}'
-```
-
-- 成功 → 比对本地版本，有新版本则提示用户更新
-- 全部失败 → **静默跳过**，继续使用当前版本
-
-### 2. ppt-master 引擎检测与自动安装
+> 安装源优先级：ZiDuNet fork（自动同步上游） → 上游原版 → AtomGit 镜像
 
 ```bash
-# 检查 ppt-master 是否存在
 if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
   echo "ppt-master 未安装，正在自动下载..."
-  # GitHub（国际）优先，AtomGit（国内镜像）兜底
-  git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
-    || git clone https://atomgit.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
-    || git clone git@github.com:hugohe3/ppt-master ~/.agents/skills/ppt-master
-  if [ $? -ne 0 ]; then
-    echo "❌ 关键依赖下载失败：ppt-master"
-    echo "   请尝试手动安装："
-    echo "   git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master"
-    echo "   或（国内）：git clone https://atomgit.com/hugohe3/ppt-master ~/.agents/skills/ppt-master"
-    echo "   无法使用 ppt-expert-workflow，任务终止。"
+
+  # 方式1: git clone（需要 git）
+  if command -v git &>/dev/null; then
+    git clone https://github.com/ZiDuNet/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+      || git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+      || git clone https://atomgit.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+      || git clone git@github.com:ZiDuNet/ppt-master ~/.agents/skills/ppt-master
+  fi
+
+  # 方式2: 无 git 时，用 curl 下载 ZIP
+  if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
+    mkdir -p ~/.agents/skills/ppt-master
+    cd /tmp && curl -sL https://github.com/ZiDuNet/ppt-master/archive/refs/heads/main.zip -o ppt-master.zip 2>/dev/null \
+      || curl -sL https://github.com/hugohe3/ppt-master/archive/refs/heads/main.zip -o ppt-master.zip 2>/dev/null
+    if [ -f ppt-master.zip ]; then
+      unzip -q ppt-master.zip -d ppt-master-tmp && cp -r ppt-master-tmp/*/* ~/.agents/skills/ppt-master/
+      rm -rf ppt-master.zip ppt-master-tmp
+    fi
+  fi
+
+  # 最终检查（不可跳过）
+  if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
+    echo "❌ ppt-master 安装失败，任务中止。请手动安装后重试："
+    echo "   GitHub(fork):  https://github.com/ZiDuNet/ppt-master → Code → Download ZIP"
+    echo "   GitHub(上游):  https://github.com/hugohe3/ppt-master → Code → Download ZIP"
+    echo "   AtomGit(镜像): https://atomgit.com/hugohe3/ppt-master → 克隆/下载 → 下载ZIP"
+    echo "   解压到 ~/.agents/skills/ppt-master/"
     exit 1
   fi
   echo "✅ ppt-master 安装完成"
 fi
 ```
 
-- ppt-master 不存在 → 自动下载，GitHub → AtomGit → GitHub SSH 三级 fallback
-- 全部失败 → 提示手动安装命令，任务终止
+安装优先级：
+1. **有 git** → `git clone`（ZiDuNet fork → 上游 → AtomGit → SSH）
+2. **无 git** → 下载 ZIP 解压（fork → 上游）
+3. **都失败** → **任务中止**，给出手动下载地址
 
-### 3. 已安装则更新（使用官方更新脚本）
+### 2. 已安装则更新
 
 ```bash
 if [ -d ~/.agents/skills/ppt-master/.git ]; then
@@ -61,7 +69,20 @@ if [ -d ~/.agents/skills/ppt-master/.git ]; then
 fi
 ```
 
-> ppt-master 官方更新方式：`python3 scripts/update_repo.py`，会自动处理远程源。
+> ZIP 安装的 ppt-master 没有 `.git` 目录，不会自动更新。需要时提示用户重新下载。
+
+### 3. 版本更新检测（可选，失败不影响使用）
+
+> 跳过条件：本机没有 git 或网络不可达 → 静默跳过，使用当前版本。
+
+```bash
+git ls-remote https://github.com/ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}' \
+  || git ls-remote https://atomgit.com/hugohe3/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}' \
+  || git ls-remote git@github.com:ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}'
+```
+
+- 成功 → 比对本地版本，有新版本则提示用户更新
+- 全部失败或无 git → **静默跳过**
 
 ---
 
@@ -71,7 +92,7 @@ fi
 
 | Skill | 安装 |
 |---|---|
-| ppt-master | 自动下载（GitHub → AtomGit 国内镜像 → SSH 三级 fallback） |
+| ppt-master | 自动下载（优先 ZiDuNet fork，自动同步上游最新版） |
 
 > 无其他依赖。无需安装 guizang-ppt-skill / html-ppt-skill / gpt-image2-ppt / huashu-slides。
 
@@ -81,20 +102,34 @@ fi
 
 **PPT 是思考，不是设计。** 市面 99% AI PPT 工具跳过"需求调研→资料搜集"直接出结果，导致内容空洞。
 
-本工作流模拟人类专家团队：需求调研 → 资料检索 → 策划稿 → 设计稿。
+本工作流模拟人类专家团队：环境检查 → 读取材料 → 需求调研 → 大纲策划 → 策划稿 → 设计稿 → 交付。
 
-## 完整流程（5步）
+## 完整流程
 
-### 0. 预检：用户有无源材料？
+> **执行顺序严格从上到下，环境检查失败则中止，不做任何内容工作。**
 
-| 情况 | 路径 |
-|---|---|
-| 用户给了 PDF / DOCX / MD / URL | → 用 ppt-master Step 1 转换，然后走本流程 |
-| 用户只给了主题/想法 | → 从本流程 Step 1 开始，搜索+架构 |
+### Step 0: 环境检查（最先执行，不可跳过）
+
+1. **ppt-master 引擎检测与自动安装**（见上方「启动检查 → 1. ppt-master 引擎检测」）
+   - 不存在 → 自动安装（git clone 或 ZIP 下载）
+   - 安装失败 → **立即中止**，提示手动安装，不做任何内容工作
+2. **ppt-master 版本更新**（见上方「启动检查 → 2. 已安装则更新」）
+3. **本 skill 版本检测**（见上方「启动检查 → 3. 版本更新检测」，可选）
+
+**环境就绪后才进入以下内容步骤。**
 
 ---
 
-### Step 1: 需求调研（先当顾问）
+### Step 1: 预检 — 用户有无源材料？
+
+| 情况 | 路径 |
+|---|---|
+| 用户给了 PDF / DOCX / MD / URL | → 读取文档内容（markitdown 转换），然后走 Step 2 |
+| 用户只给了主题/想法 | → 从 Step 2 开始，搜索 + 架构 |
+
+---
+
+### Step 2: 需求调研（先当顾问）
 
 **目标**：不急着出大纲，先问清楚。
 
@@ -109,7 +144,7 @@ fi
 
 ---
 
-### Step 2: 大纲策划（金字塔原理）
+### Step 3: 大纲策划（金字塔原理）
 
 用 ppt-master Step 4 Strategist Phase 的八项确认，加上金字塔原理：
 
@@ -122,7 +157,7 @@ fi
 
 ---
 
-### Step 3: 策划稿（版面规划）★ 新增关键步骤
+### Step 4: 策划稿（版面规划）★ 新增关键步骤
 
 > 顶尖 PPT 公司（¥10,000+/页）有专门的"策划师"岗位。
 > 策划师输出 PPT 草稿：每页什么位置放什么元素、什么版式。
@@ -139,7 +174,7 @@ fi
 
 ---
 
-### Step 4: 设计稿（卡片式 SVG + 执行）
+### Step 5: 设计稿（卡片式 SVG + 执行）
 
 **布局系统：Bento Grid（便当网格）**
 
@@ -169,7 +204,7 @@ python3 ~/.agents/skills/ppt-master/skills/ppt-master/scripts/project_manager.py
 
 ---
 
-### Step 5: 输出与交付
+### Step 6: 输出与交付
 
 ```bash
 python3 scripts/total_md_split.py <project_path>

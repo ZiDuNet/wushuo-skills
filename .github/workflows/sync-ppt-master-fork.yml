@@ -1,0 +1,86 @@
+name: Sync ppt-master fork
+
+on:
+  schedule:
+    # 每天 UTC 3:00（北京时间 11:00）
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync-github:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      changed: ${{ steps.sync.outputs.changed }}
+    steps:
+      - name: Sync ZiDuNet/ppt-master with upstream
+        id: sync
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const upstreamOwner = 'hugohe3';
+            const upstreamRepo = 'ppt-master';
+            const forkOwner = 'ZiDuNet';
+            const forkRepo = 'ppt-master';
+            const branch = 'main';
+
+            const { data: upstreamRef } = await github.rest.git.getRef({
+              owner: upstreamOwner,
+              repo: upstreamRepo,
+              ref: `heads/${branch}`
+            });
+            const upstreamSha = upstreamRef.object.sha;
+
+            let forkSha = '';
+            try {
+              const { data: forkRef } = await github.rest.git.getRef({
+                owner: forkOwner,
+                repo: forkRepo,
+                ref: `heads/${branch}`
+              });
+              forkSha = forkRef.object.sha;
+            } catch (e) {
+              core.setOutput('changed', 'true');
+            }
+
+            if (forkSha === upstreamSha) {
+              console.log('Already in sync, skipping.');
+              core.setOutput('changed', 'false');
+              return;
+            }
+
+            await github.rest.git.updateRef({
+              owner: forkOwner,
+              repo: forkRepo,
+              ref: `heads/${branch}`,
+              sha: upstreamSha,
+              force: true
+            });
+
+            console.log(`Synced to ${upstreamSha}`);
+            core.setOutput('changed', 'true');
+
+  sync-gitee:
+    needs: sync-github
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          repository: ZiDuNet/ppt-master
+          ref: main
+          fetch-depth: 0
+
+      - name: Push to Gitee mirror
+        env:
+          GITEE_SSH_KEY: ${{ secrets.GITEE_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$GITEE_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan gitee.com >> ~/.ssh/known_hosts 2>/dev/null
+          git remote add gitee git@gitee.com:Shuo_wu/ppt-master.git
+          git push gitee main --force
+          echo "Synced to Gitee"
