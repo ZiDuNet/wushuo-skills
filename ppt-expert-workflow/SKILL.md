@@ -1,6 +1,6 @@
 ---
 name: ppt-expert-workflow
-version: 1.0.1
+version: 1.0.2
 description: >
   整合 DrawBookAI 专家工作流 + ppt-master 的混合 PPT 制作方法。
   先需求调研 → 资料检索 → 策划稿 → 卡片式SVG设计 → PPTX输出。
@@ -8,7 +8,7 @@ description: >
 repo: https://github.com/ZiDuNet/wushuo-skills/tree/master/ppt-expert-workflow
 ---
 
-# PPT 专家工作流 (Expert Workflow) v1.0.1
+# PPT 专家工作流 (Expert Workflow) v1.0.2
 
 > 整合 DrawBookAI 四步专家工作流 + ppt-master SVG→PPTX 管线
 
@@ -19,13 +19,14 @@ repo: https://github.com/ZiDuNet/wushuo-skills/tree/master/ppt-expert-workflow
 ### 1. 版本更新检测
 
 ```bash
-# 检查 GitHub 上是否有新版本（HTTPS 不通时自动尝试 SSH）
+# 按优先级尝试：GitHub HTTPS → Gitee/AtomGit HTTPS → GitHub SSH
 git ls-remote https://github.com/ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}' \
+  || git ls-remote https://gitee.com/ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}' \
   || git ls-remote git@github.com:ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | awk '{print $1}'
 ```
 
 - 成功 → 比对本地版本，有新版本则提示用户更新
-- 失败（网络不通/GitHub 不可达）→ **静默跳过**，继续使用当前版本
+- 全部失败 → **静默跳过**，继续使用当前版本
 
 ### 2. ppt-master 引擎检测与自动安装
 
@@ -33,11 +34,15 @@ git ls-remote https://github.com/ZiDuNet/wushuo-skills.git HEAD 2>/dev/null | aw
 # 检查 ppt-master 是否存在
 if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
   echo "ppt-master 未安装，正在自动下载..."
+  # GitHub（国际）优先，AtomGit（国内镜像）兜底
   git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+    || git clone https://atomgit.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
     || git clone git@github.com:hugohe3/ppt-master ~/.agents/skills/ppt-master
   if [ $? -ne 0 ]; then
     echo "❌ 关键依赖下载失败：ppt-master"
-    echo "   请确认本机能否访问 GitHub: https://github.com/hugohe3/ppt-master"
+    echo "   请尝试手动安装："
+    echo "   git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master"
+    echo "   或（国内）：git clone https://atomgit.com/hugohe3/ppt-master ~/.agents/skills/ppt-master"
     echo "   无法使用 ppt-expert-workflow，任务终止。"
     exit 1
   fi
@@ -45,17 +50,18 @@ if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
 fi
 ```
 
-- ppt-master 不存在 → 自动 `git clone` 安装
-- 下载失败 → **拦截使用**，提醒用户检查 GitHub 访问
-- 下载成功 → 继续
+- ppt-master 不存在 → 自动下载，GitHub → AtomGit → GitHub SSH 三级 fallback
+- 全部失败 → 提示手动安装命令，任务终止
 
-### 3. 已安装则更新
+### 3. 已安装则更新（使用官方更新脚本）
 
 ```bash
 if [ -d ~/.agents/skills/ppt-master/.git ]; then
-  cd ~/.agents/skills/ppt-master && git pull origin main 2>/dev/null || true
+  python3 ~/.agents/skills/ppt-master/skills/ppt-master/scripts/update_repo.py 2>/dev/null || true
 fi
 ```
+
+> ppt-master 官方更新方式：`python3 scripts/update_repo.py`，会自动处理远程源。
 
 ---
 
@@ -65,7 +71,7 @@ fi
 
 | Skill | 安装 |
 |---|---|
-| ppt-master | 自动下载（HTTPS 优先，不通则走 SSH） |
+| ppt-master | 自动下载（GitHub → AtomGit 国内镜像 → SSH 三级 fallback） |
 
 > 无其他依赖。无需安装 guizang-ppt-skill / html-ppt-skill / gpt-image2-ppt / huashu-slides。
 
