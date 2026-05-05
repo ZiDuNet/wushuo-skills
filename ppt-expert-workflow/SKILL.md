@@ -1,5 +1,6 @@
 ---
 name: ppt-expert-workflow
+version: 1
 description: >
   整合 DrawBookAI 专家工作流 + ppt-master 的混合 PPT 制作方法。
   先需求调研 → 资料检索 → 策划稿 → 卡片式SVG设计 → PPTX输出。

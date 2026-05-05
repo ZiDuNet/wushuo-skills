@@ -4,9 +4,9 @@
 
 ## Skills 列表
 
-| Skill | 说明 | 状态 |
-|---|---|---|
-| [ppt-expert-workflow](ppt-expert-workflow/SKILL.md) | PPT 专家工作流：需求调研 → 资料检索 → 策划稿 → 卡片式 SVG 设计 → PPTX 输出 | ✅ 可用 |
+| Skill | 版本 | 说明 | 状态 |
+|---|---|---|---|
+| [ppt-expert-workflow](ppt-expert-workflow/SKILL.md) | v1 | PPT 专家工作流：需求调研 → 资料检索 → 策划稿 → 卡片式 SVG 设计 → PPTX 输出 | ✅ 可用 |
 
 ## ppt-expert-workflow 概述
 
