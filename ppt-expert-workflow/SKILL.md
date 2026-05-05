@@ -1,6 +1,6 @@
 ---
 name: ppt-expert-workflow
-version: 1.0.2
+version: 1.0.3
 description: >
   整合 DrawBookAI 专家工作流 + ppt-master 的混合 PPT 制作方法。
   环境检查 → 读取材料 → 需求调研 → 策划稿 → 卡片式SVG设计 → PPTX输出。
@@ -8,7 +8,7 @@ description: >
 repo: https://github.com/ZiDuNet/wushuo-skills/tree/master/ppt-expert-workflow
 ---
 
-# PPT 专家工作流 (Expert Workflow) v1.0.2
+# PPT 专家工作流 (Expert Workflow) v1.0.3
 
 > 整合 DrawBookAI 四步专家工作流 + ppt-master SVG→PPTX 管线
 
@@ -18,7 +18,7 @@ repo: https://github.com/ZiDuNet/wushuo-skills/tree/master/ppt-expert-workflow
 
 ### 1. ppt-master 引擎检测与自动安装（必须通过）
 
-> 安装源优先级：ZiDuNet fork（自动同步上游） → 上游原版 → AtomGit 镜像
+> 安装源优先级：Gitee 镜像 → AtomGit 镜像 → ZiDuNet fork → 上游原版
 
 ```bash
 if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
@@ -26,9 +26,10 @@ if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
 
   # 方式1: git clone（需要 git）
   if command -v git &>/dev/null; then
-    git clone https://github.com/ZiDuNet/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
-      || git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+    git clone https://gitee.com/Shuo_wu/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
       || git clone https://atomgit.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+      || git clone https://github.com/ZiDuNet/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
+      || git clone https://github.com/hugohe3/ppt-master ~/.agents/skills/ppt-master 2>/dev/null \
       || git clone git@github.com:ZiDuNet/ppt-master ~/.agents/skills/ppt-master
   fi
 
@@ -43,28 +44,51 @@ if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
     fi
   fi
 
-  # 最终检查（不可跳过）
+  # 最终检查：ppt-master 安装失败时，尝试使用用户已有的 PPT skill
   if [ ! -d ~/.agents/skills/ppt-master/skills/ppt-master/scripts ]; then
-    echo "❌ ppt-master 安装失败，任务中止。请手动安装后重试："
-    echo "   GitHub(fork):  https://github.com/ZiDuNet/ppt-master → Code → Download ZIP"
-    echo "   GitHub(上游):  https://github.com/hugohe3/ppt-master → Code → Download ZIP"
-    echo "   AtomGit(镜像): https://atomgit.com/hugohe3/ppt-master → 克隆/下载 → 下载ZIP"
-    echo "   解压到 ~/.agents/skills/ppt-master/"
-    exit 1
+    echo "⚠️ ppt-master 自动安装失败，正在查找本机已有的 PPT skill..."
+    # 搜索用户环境中已有的 PPT 相关 skill
+    existing_skill=""
+    for skill_dir in ~/.agents/skills/*/skills/*/SKILL.md; do
+      if [ -f "$skill_dir" ] && grep -qi "ppt\|slide\|presentation" "$skill_dir" 2>/dev/null; then
+        existing_skill="$skill_dir"
+        break
+      fi
+    done
+    if [ -n "$existing_skill" ]; then
+      echo "✅ 找到已有 PPT skill: $existing_skill"
+      echo "   将使用该 skill 作为替代引擎。"
+      echo "   注意：部分高级功能（Bento Grid、自动策划稿）可能不可用。"
+    else
+      echo "❌ 未找到任何 PPT skill，任务中止。请手动安装："
+      echo "   Gitee(镜像):   https://gitee.com/Shuo_wu/ppt-master → 克隆/下载"
+      echo "   GitHub(fork):  https://github.com/ZiDuNet/ppt-master → Code → Download ZIP"
+      echo "   AtomGit(镜像): https://atomgit.com/hugohe3/ppt-master → 克隆/下载"
+      echo "   GitHub(上游):  https://github.com/hugohe3/ppt-master → Code → Download ZIP"
+      echo "   解压到 ~/.agents/skills/ppt-master/"
+      exit 1
+    fi
+  else
+    echo "✅ ppt-master 安装完成"
   fi
-  echo "✅ ppt-master 安装完成"
 fi
 ```
 
 安装优先级：
-1. **有 git** → `git clone`（ZiDuNet fork → 上游 → AtomGit → SSH）
-2. **无 git** → 下载 ZIP 解压（fork → 上游）
-3. **都失败** → **任务中止**，给出手动下载地址
+1. **有 git** → `git clone`（Gitee → AtomGit → ZiDuNet fork → 上游 → SSH）
+2. **无 git** → 下载 ZIP 解压（Gitee → ZiDuNet fork → 上游）
+3. **都失败** → 搜索用户已有的 PPT skill 作为替代
+4. **都没有** → **任务中止**，给出手动下载地址
 
 ### 2. 已安装则更新
 
 ```bash
 if [ -d ~/.agents/skills/ppt-master/.git ]; then
+  # 优先从 Gitee 拉取（国内快）
+  cd ~/.agents/skills/ppt-master
+  git remote set-url origin https://gitee.com/Shuo_wu/ppt-master.git 2>/dev/null
+  git pull origin main 2>/dev/null || true
+  # Gitee 失败则用官方更新脚本
   python3 ~/.agents/skills/ppt-master/skills/ppt-master/scripts/update_repo.py 2>/dev/null || true
 fi
 ```
