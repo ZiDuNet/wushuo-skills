@@ -1,0 +1,57 @@
+<!--
+  AI赋能 I/O 流程图模板
+  适用：L2/L3 场景展示行业输入→AI处理→产出的流程
+  定制项：替换5行场景描述为企业真实场景，提效倍数
+  色板：输入(蓝#EFF6FF) → 处理(紫#F5F3FF) → 产出(绿#ECFDF5)
+-->
+<mxGraphModel>
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    
+    <mxCell id="title" value="&lt;b&gt;AI赋能{{INDUSTRY}}：从输入到产出&lt;/b&gt;" style="text;fontSize=18;fontColor=#1E3A5F;align=center;" vertex="1" parent="1">
+      <mxGeometry x="180" y="10" width="540" height="30" as="geometry"/>
+    </mxCell>
+    
+    <!-- 列头 -->
+    <mxCell id="h-input" value="&lt;b&gt;📥 你输入&lt;/b&gt;" style="rounded=1;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=2;fontSize=14;fontColor=#1D4ED8;" vertex="1" parent="1">
+      <mxGeometry x="60" y="55" width="180" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="h-process" value="&lt;b&gt;⚡ AI处理&lt;/b&gt;" style="rounded=1;fillColor=#EDE9FE;strokeColor=#7C3AED;strokeWidth=2;fontSize=14;fontColor=#6D28D9;" vertex="1" parent="1">
+      <mxGeometry x="330" y="55" width="180" height="35" as="geometry"/>
+    </mxCell>
+    <mxCell id="h-output" value="&lt;b&gt;📤 你拿到&lt;/b&gt;" style="rounded=1;fillColor=#D1FAE5;strokeColor=#10B981;strokeWidth=2;fontSize=14;fontColor=#047857;" vertex="1" parent="1">
+      <mxGeometry x="600" y="55" width="180" height="35" as="geometry"/>
+    </mxCell>
+    
+    <!-- 行模板 (复制5行，替换 {{R*}} 占位符) -->
+    <!-- 
+      每行结构:
+      - rN-in: 输入框 (x=60, y=110+60*N)
+      - rN-ar1: 箭头1 (输入→处理)
+      - rN-proc: 处理框 (x=330, y=110+60*N)
+      - rN-ar2: 箭头2 (处理→输出)
+      - rN-out: 输出框 (x=600, y=110+60*N)
+    -->
+    
+    <!-- 行1 -->
+    <mxCell id="r1-in" value="{{R1_INPUT}}" style="rounded=1;fillColor=#EFF6FF;strokeColor=#93C5FD;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="60" y="110" width="180" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="r1-ar1" value="" style="endArrow=classic;strokeColor=#7C3AED;strokeWidth=1.5;" edge="1" parent="1" source="r1-in" target="r1-proc"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="r1-proc" value="{{R1_PROCESS}}" style="rounded=1;fillColor=#F5F3FF;strokeColor=#C4B5FD;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="330" y="110" width="180" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="r1-ar2" value="" style="endArrow=classic;strokeColor=#10B981;strokeWidth=1.5;" edge="1" parent="1" source="r1-proc" target="r1-out"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="r1-out" value="✅ {{R1_OUTPUT}}&lt;br&gt;⏱ {{R1_GAIN}}" style="rounded=1;fillColor=#ECFDF5;strokeColor=#6EE7B7;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="600" y="110" width="180" height="45" as="geometry"/>
+    </mxCell>
+    
+    <!-- 行2-5 同上模式，y 每次 +60 -->
+    
+    <!-- 底部核心理念条 -->
+    <mxCell id="principle" value="&lt;b&gt;核心理念：输入原始素材 → AI结构化处理 → 输出可直接交付的成果&lt;/b&gt;" style="rounded=1;fillColor=#1E3A5F;strokeColor=#0F172A;fontSize=12;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="120" y="415" width="600" height="30" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>

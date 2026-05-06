@@ -1,0 +1,73 @@
+<!--
+  课程体系三层架构图模板
+  适用：L2/L3 场景展示课程模块递进关系
+  定制项：替换 M1/M2/M3 的模块名称、天数、技能编号、行业场景
+  色板：基础层(蓝#4338CA) → 提效层(绿#059669) → 实战层(橙#EA580C)
+-->
+<mxGraphModel>
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    
+    <mxCell id="title" value="&lt;b&gt;{{CLIENT_NAME}} · AI赋能课程体系架构&lt;/b&gt;" style="text;fontSize=18;fontColor=#1E3A5F;align=center;" vertex="1" parent="1">
+      <mxGeometry x="200" y="15" width="500" height="30" as="geometry"/>
+    </mxCell>
+    
+    <!-- 左侧层级标签 -->
+    <mxCell id="l1-label" value="&lt;b&gt;基础层&lt;/b&gt;" style="rounded=1;fillColor=#EEF2FF;strokeColor=#4338CA;fontSize=14;fontColor=#4338CA;" vertex="1" parent="1">
+      <mxGeometry x="30" y="65" width="70" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="l2-label" value="&lt;b&gt;提效层&lt;/b&gt;" style="rounded=1;fillColor=#ECFDF5;strokeColor=#059669;fontSize=14;fontColor=#059669;" vertex="1" parent="1">
+      <mxGeometry x="30" y="170" width="70" height="85" as="geometry"/>
+    </mxCell>
+    <mxCell id="l3-label" value="&lt;b&gt;实战层&lt;/b&gt;" style="rounded=1;fillColor=#FFF7ED;strokeColor=#EA580C;fontSize=14;fontColor=#EA580C;" vertex="1" parent="1">
+      <mxGeometry x="30" y="275" width="70" height="85" as="geometry"/>
+    </mxCell>
+    
+    <!-- 层1模块框 | 定制: 模块名/天数/角色/目标 -->
+    <mxCell id="m1-box" value="&lt;b&gt;{{M1_NAME}}&lt;/b&gt;&lt;br&gt;⏱ {{M1_DAYS}} · ⭐ {{M1_LEVEL}}&lt;br&gt;👥 {{M1_AUDIENCE}}&lt;br&gt;🎯 {{M1_GOAL}}" style="rounded=1;fillColor=#EEF2FF;strokeColor=#4338CA;strokeWidth=2;fontSize=12;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="120" y="60" width="350" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="m1-skills" value="{{M1_SKILLS}}" style="rounded=1;fillColor=#C7D2FE;strokeColor=#4338CA;fontSize=11;fontColor=#3730A3;" vertex="1" parent="1">
+      <mxGeometry x="490" y="80" width="120" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="arrow1-2" style="edgeStyle=orthogonalEdgeStyle;endArrow=classic;strokeColor=#4338CA;strokeWidth=2;" edge="1" parent="1" source="m1-box" target="m2-box">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    
+    <!-- 层2 -->
+    <mxCell id="m2-box" value="&lt;b&gt;{{M2_NAME}}&lt;/b&gt;&lt;br&gt;⏱ {{M2_DAYS}} · ⭐⭐ {{M2_LEVEL}}&lt;br&gt;👥 {{M2_AUDIENCE}}&lt;br&gt;🎯 {{M2_GOAL}}" style="rounded=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;fontSize=12;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="120" y="165" width="350" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="m2-skills" value="{{M2_SKILLS}}" style="rounded=1;fillColor=#A7F3D0;strokeColor=#059669;fontSize=11;fontColor=#065F46;" vertex="1" parent="1">
+      <mxGeometry x="490" y="185" width="120" height="50" as="geometry"/>
+    </mxCell>
+    <mxCell id="arrow2-3" style="edgeStyle=orthogonalEdgeStyle;endArrow=classic;strokeColor=#059669;strokeWidth=2;" edge="1" parent="1" source="m2-box" target="m3-box">
+      <mxGeometry relative="1" as="geometry"/>
+    </mxCell>
+    
+    <!-- 层3 -->
+    <mxCell id="m3-box" value="&lt;b&gt;{{M3_NAME}}&lt;/b&gt;&lt;br&gt;⏱ {{M3_DAYS}} · ⭐⭐⭐ {{M3_LEVEL}}&lt;br&gt;👥 {{M3_AUDIENCE}}&lt;br&gt;🎯 {{M3_GOAL}}" style="rounded=1;fillColor=#FFF7ED;strokeColor=#EA580C;strokeWidth=2;fontSize=12;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="120" y="270" width="350" height="90" as="geometry"/>
+    </mxCell>
+    <mxCell id="m3-skills" value="{{M3_SKILLS}}" style="rounded=1;fillColor=#FED7AA;strokeColor=#EA580C;fontSize=11;fontColor=#9A3412;" vertex="1" parent="1">
+      <mxGeometry x="490" y="280" width="120" height="60" as="geometry"/>
+    </mxCell>
+    
+    <!-- 右侧行业场景标签 -->
+    <mxCell id="scene-m1" value="{{M1_SCENE}}" style="rounded=1;fillColor=#F8FAFC;strokeColor=#94A3B8;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="630" y="75" width="140" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="scene-m2" value="{{M2_SCENE}}" style="rounded=1;fillColor=#F8FAFC;strokeColor=#94A3B8;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="630" y="180" width="140" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="scene-m3" value="{{M3_SCENE}}" style="rounded=1;fillColor=#F8FAFC;strokeColor=#94A3B8;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="630" y="285" width="140" height="45" as="geometry"/>
+    </mxCell>
+    
+    <!-- 底部总结条 -->
+    <mxCell id="total" value="&lt;b&gt;{{SUMMARY}}&lt;/b&gt;" style="rounded=1;fillColor=#1E3A5F;strokeColor=#0F172A;fontSize=13;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="200" y="385" width="350" height="35" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>

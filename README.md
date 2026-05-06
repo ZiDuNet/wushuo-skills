@@ -14,7 +14,7 @@
 | poster-screen | v2.0.0 | 海报生成与智慧屏投放 | ✅ 可用 |
 | alt-image-parse | v2.0.0 | AI 图片解析 | ✅ 可用 |
 | alt-tools_web | v2.0.0 | 网络搜索与网页读取 | ✅ 可用 |
-| [cx-ai-empower-plan](chaoxi_培训类/cx-ai-course-recommendation/SKILL.md) | v0.4.0 | AI赋能方案生成（5种场景宣传材料） | ✅ 可用 |
+| [cx-ai-empower-plan](chaoxi_培训类/cx-ai-course-recommendation/SKILL.md) | v1.0.0 | AI赋能方案生成（5种场景宣传材料，draw.io图表，够用版模式，PDF干净HTML链路） | ✅ 可用 |
 
 ## ppt-expert-workflow 概述
 

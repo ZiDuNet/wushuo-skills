@@ -1,0 +1,65 @@
+<!--
+  课程实施甘特图模板
+  适用：L2/L3 场景展示多模块/多天课程时间安排
+  定制项：替换模块名称、半天主题、天数范围、产出目标
+  色板：基础层(蓝渐变) / 提效层(绿渐变) / 实战层(橙渐变)
+  每行 4个阶段框 + 箭头连接 + 右侧产出目标
+-->
+<mxGraphModel>
+  <root>
+    <mxCell id="0"/>
+    <mxCell id="1" parent="0"/>
+    
+    <mxCell id="title" value="&lt;b&gt;{{TOTAL_DAYS}}天AI赋能实施节奏&lt;/b&gt;" style="text;fontSize=18;fontColor=#1E3A5F;align=center;" vertex="1" parent="1">
+      <mxGeometry x="200" y="10" width="400" height="30" as="geometry"/>
+    </mxCell>
+    
+    <!-- 天数列头 -->
+    <mxCell id="d1" value="&lt;b&gt;{{DAY1_RANGE}}&lt;/b&gt;" style="rounded=1;fillColor=#1E3A5F;strokeColor=#0F172A;fontSize=13;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="160" y="55" width="200" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="d2" value="&lt;b&gt;{{DAY2_RANGE}}&lt;/b&gt;" style="rounded=1;fillColor=#1E3A5F;strokeColor=#0F172A;fontSize=13;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="370" y="55" width="200" height="30" as="geometry"/>
+    </mxCell>
+    <mxCell id="d3" value="&lt;b&gt;{{DAY3_RANGE}}&lt;/b&gt;" style="rounded=1;fillColor=#1E3A5F;strokeColor=#0F172A;fontSize=13;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="580" y="55" width="200" height="30" as="geometry"/>
+    </mxCell>
+    
+    <!-- 行模板 (复制3行，对应3个模块) -->
+    <!-- 
+      每行结构:
+      - row-label: 左侧模块标签
+      - 4个阶段框: p1(x=100, w=120) → p2(x=230, w=120) → p3(x=360, w=120) → p4(x=490, w=120)
+      - 渐变填充由浅入深，最终框更深色
+      - target: 右侧产出目标框 (x=620, w=160)
+    -->
+    
+    <!-- 行1: {{M1_NAME}} -->
+    <mxCell id="row1-label" value="&lt;b&gt;{{M1_SHORT}}&lt;br&gt;基础层&lt;/b&gt;" style="rounded=1;fillColor=#EEF2FF;strokeColor=#4338CA;fontSize=12;fontColor=#3730A3;" vertex="1" parent="1">
+      <mxGeometry x="30" y="110" width="60" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="m1-p1" value="半天1&lt;br&gt;{{M1_T1}}" style="rounded=1;fillColor=#DBEAFE;strokeColor=#818CF8;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="100" y="108" width="120" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="m1-p2" value="半天2&lt;br&gt;{{M1_T2}}" style="rounded=1;fillColor=#C7D2FE;strokeColor=#6366F1;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="230" y="108" width="120" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="m1-p3" value="半天3&lt;br&gt;{{M1_T3}}" style="rounded=1;fillColor=#A5B4FC;strokeColor=#4F46E5;fontSize=11;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="360" y="108" width="120" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="m1-p4" value="半天4&lt;br&gt;{{M1_T4}}" style="rounded=1;fillColor=#6366F1;strokeColor=#4338CA;fontSize=11;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="490" y="108" width="120" height="55" as="geometry"/>
+    </mxCell>
+    <mxCell id="m1-target" value="🎯 {{M1_TARGET}}" style="rounded=1;fillColor=#E0E7FF;strokeColor=#4338CA;fontSize=11;dashed=1;" vertex="1" parent="1">
+      <mxGeometry x="620" y="115" width="160" height="45" as="geometry"/>
+    </mxCell>
+    <mxCell id="ar-m1-1" style="endArrow=classic;strokeColor=#818CF8;strokeWidth=1;" edge="1" parent="1" source="m1-p1" target="m1-p2"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ar-m1-2" style="endArrow=classic;strokeColor=#818CF8;strokeWidth=1;" edge="1" parent="1" source="m1-p2" target="m1-p3"><mxGeometry relative="1" as="geometry"/></mxCell>
+    <mxCell id="ar-m1-3" style="endArrow=classic;strokeColor=#818CF8;strokeWidth=1;" edge="1" parent="1" source="m1-p3" target="m1-p4"><mxGeometry relative="1" as="geometry"/></mxCell>
+    
+    <!-- 底部时间结构说明 -->
+    <mxCell id="bottom" value="&lt;b&gt;每半天结构：理论讲解(90min) → 实操演练(75min) → 场景实战(90min) → 复盘产出(75min)&lt;/b&gt;" style="rounded=1;fillColor=#1E3A5F;strokeColor=#0F172A;fontSize=11;fontColor=#FFFFFF;" vertex="1" parent="1">
+      <mxGeometry x="80" y="340" width="680" height="30" as="geometry"/>
+    </mxCell>
+  </root>
+</mxGraphModel>
