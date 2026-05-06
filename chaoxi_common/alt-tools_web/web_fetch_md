@@ -1,0 +1,76 @@
+#!/bin/bash
+set -euo pipefail
+
+CACHE_DIR="$(cd "$(dirname "$0")" && pwd)/.cache"
+CACHE_DAYS=7
+
+show_help() {
+  cat <<EOF
+web_fetch_md - Fetch web page and extract main content as Markdown
+
+Usage:
+  web_fetch_md <url>
+
+Description:
+  Parse a web page's HTML into clean Markdown using Defuddle.
+  Results are cached for ${CACHE_DAYS} days based on URL hash.
+  Not suitable for SPA / JS-rendered pages.
+
+Arguments:
+  url      URL to fetch (required)
+
+Environment:
+  Cached files are stored in ${CACHE_DIR}/
+
+Examples:
+  web_fetch_md https://example.com/article
+EOF
+}
+
+cleanup_cache() {
+  find "$CACHE_DIR" -name "*.md" -mtime +${CACHE_DAYS} -delete 2>/dev/null || true
+}
+
+if [ $# -eq 0 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+  show_help
+  exit 0
+fi
+
+URL="$1"
+
+if [ -z "$URL" ]; then
+  echo "Error: URL is required" >&2
+  exit 1
+fi
+
+mkdir -p "$CACHE_DIR"
+
+if command -v md5 &>/dev/null; then
+  URL_HASH=$(printf '%s' "$URL" | md5 | awk '{print $1}')
+elif command -v md5sum &>/dev/null; then
+  URL_HASH=$(printf '%s' "$URL" | md5sum | awk '{print $1}')
+else
+  URL_HASH=$(printf '%s' "$URL" | cksum | awk '{print $1}')
+fi
+CACHE_FILE="${CACHE_DIR}/${URL_HASH}.md"
+
+# Return cache if valid
+if [ -f "$CACHE_FILE" ]; then
+  cat "$CACHE_FILE"
+  cleanup_cache
+  exit 0
+fi
+
+# Fetch and parse
+RESULT=$(defuddle parse "$URL" --markdown 2>/dev/null)
+
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to fetch or parse $URL" >&2
+  exit 1
+fi
+
+# Save to cache and output
+printf '%s' "$RESULT" > "$CACHE_FILE"
+printf '%s' "$RESULT"
+
+cleanup_cache

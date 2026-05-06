@@ -1,0 +1,13 @@
+{
+  "name": "feishu-wiki-tool",
+  "version": "1.0.0",
+  "description": "飞书Wiki检索工具 - 直接对接飞书API访问知识库",
+  "main": "feishu-wiki.js",
+  "scripts": {
+    "wiki": "node feishu-wiki.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {}
+}

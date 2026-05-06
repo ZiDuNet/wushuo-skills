@@ -1,0 +1,46 @@
+#!/bin/bash
+set -euo pipefail
+
+show_help() {
+  cat <<EOF
+web_search - Web search via MiniMax API
+
+Usage:
+  web_search <query>
+
+Description:
+  Search the web and return results as JSON.
+
+Arguments:
+  query    Search keywords (required)
+
+Environment:
+  MINIMAX_CODING_KEY    MiniMax API key (required)
+
+Examples:
+  web_search "Claude Code"
+  web_search 'how to use "git rebase"'
+  web_search "Python 正则表达式 & 爬虫"
+EOF
+}
+
+if [ $# -eq 0 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+  show_help
+  exit 0
+fi
+
+QUERY="$*"
+
+if [ -z "${MINIMAX_CODING_KEY:-}" ]; then
+  echo "Error: MINIMAX_CODING_KEY is not set" >&2
+  exit 1
+fi
+
+PAYLOAD=$(printf '%s' "$QUERY" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+PAYLOAD="{\"q\":\"${PAYLOAD}\"}"
+
+curl -s -X POST "https://api.minimaxi.com/v1/coding_plan/search" \
+  -H "Authorization: Bearer ${MINIMAX_CODING_KEY}" \
+  -H "Content-Type: application/json" \
+  -H "MM-API-Source: Minimax-MCP" \
+  -d "$PAYLOAD"

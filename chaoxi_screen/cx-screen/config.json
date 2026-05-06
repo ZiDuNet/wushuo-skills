@@ -1,0 +1,11 @@
+{
+  "api": {
+    "baseURL": "https://chaoxi.live/api",
+    "timeout": 20000
+  },
+  "storage": {
+    "dir": "~/.cx-screen",
+    "authFile": "auth.json",
+    "sessionFile": "session.json"
+  }
+}
