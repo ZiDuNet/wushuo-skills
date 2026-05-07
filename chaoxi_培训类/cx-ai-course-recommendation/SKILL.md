@@ -285,6 +285,10 @@ node $SCRIPT --cached read-doc <obj_token>
 
 **P8: draw.io 文本中禁止使用 HTML 标签/实体**
 
+---
+
+## 八、知识库访问工具
+
 > 所有知识库操作通过 `feishu-wiki.js` 脚本完成，不使用 lark-cli。
 > 脚本位置：SKILL.md 同目录下 `scripts/feishu-wiki.js`
 
